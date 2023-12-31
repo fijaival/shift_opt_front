@@ -1,13 +1,17 @@
 <template>
   <div id="app">
-    <h1>Vue with Flask</h1>
+    <Header />
     <router-view />
   </div>
 </template>
 
 <script>
+import Header from "./components/globals/Header.vue";
+
 export default {
-  name: "App",
+  components: {
+    Header,
+  },
 };
 </script>
 
