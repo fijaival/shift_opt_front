@@ -52,7 +52,9 @@ input {
 }
 </style>
 <script lang="ts">
-// import { useStore } from "@/store"; // Vuexストアをインポート
+import aspida from "@aspida/axios";
+import api from "../../../api/$api";
+import { AxiosError } from "axios";
 
 export default {
   name: "Login",
@@ -68,29 +70,42 @@ export default {
     async login() {
       const requestBody = { username: this.username, password: this.password };
       try {
-        const response = await this.$axios.post("/auth/login", requestBody, {
-          withCredentials: true,
-        });
+        const client = api(aspida(this.$axios));
+        const response = await client.v1.auth.login.post({ body: requestBody });
         console.log(response);
-        const csrfAccessToken = response.headers["x-access-token-csrf"];
-        const csrfRefreshToken = response.headers["x-refresh-token-csrf"];
+        if (response.status === 200 && response.body) {
+          const csrfAccessToken = response.headers["x-access-token-csrf"];
+          const csrfRefreshToken = response.headers["x-refresh-token-csrf"];
 
-        await this.$store.dispatch("csrf/saveCsrfAccessToken", csrfAccessToken);
-        await this.$store.dispatch(
-          "csrf/saveCsrfRefreshToken",
-          csrfRefreshToken
-        );
-        await this.$store.dispatch("user/setUser", this.username);
+          await this.$store.dispatch(
+            "csrf/saveCsrfAccessToken",
+            csrfAccessToken
+          );
+          await this.$store.dispatch(
+            "csrf/saveCsrfRefreshToken",
+            csrfRefreshToken
+          );
+          await this.$store.dispatch("user/setUser", this.username);
 
-        this.$router.push({
-          path:
-            typeof this.$route.query.redirect === "string"
-              ? this.$route.query.redirect
-              : "/",
-        });
-        this.msg = response.data.login;
+          this.$router.push({
+            path:
+              typeof this.$route.query.redirect === "string"
+                ? this.$route.query.redirect
+                : "/",
+          });
+        } else {
+          throw new Error("Invalid response");
+        }
       } catch (error) {
-        console.error(error);
+        const e = error as AxiosError; // errorをAxiosError型にキャスト
+        if (e.response && e.response.status === 401) {
+          // 401 Unauthorized の場合のメッセージ
+          this.msg = "アカウント名またはパスワードが間違っています";
+        } else {
+          // その他のエラーの場合
+          this.msg = "ログインに失敗しました";
+        }
+        console.error(e);
       }
     },
   },

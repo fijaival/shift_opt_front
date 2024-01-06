@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouterOptions } from "vue-router";
 import HomeView from "../components/pages/HomeView.vue";
-import AboutView from "../components/pages/AboutView.vue";
+import DriverView from "../components/pages/DriverView.vue";
+import EmployeeView from "../components/pages/Employees.vue";
 import Login from "../components/pages/Login.vue";
 import store from "../store/index.ts";
 
@@ -16,9 +17,17 @@ const router = createRouter({
       },
     },
     {
-      name: "About",
-      path: "/about",
-      component: AboutView,
+      name: "Driver",
+      path: "/driver",
+      component: DriverView,
+      meta: {
+        requiresAuth: true, // 認証済の時のみ閲覧可能となるように定義
+      },
+    },
+    {
+      name: "Employee",
+      path: "/employee",
+      component: EmployeeView,
       meta: {
         requiresAuth: true, // 認証済の時のみ閲覧可能となるように定義
       },

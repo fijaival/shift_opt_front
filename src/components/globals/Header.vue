@@ -1,7 +1,8 @@
 <template>
   <div id="nav" v-if="isLogin">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
+    <router-link to="/driver">Driver</router-link> |
+    <router-link to="/employee">Employee</router-link> |
     <a @click="logout()">Logout</a>
   </div>
 </template>
