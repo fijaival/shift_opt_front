@@ -1,22 +1,6 @@
 <script lang="ts">
-import aspida from "@aspida/axios";
-import api from "../../../api/$api";
-
-interface Driver {
-  id: number;
-  first_name: string;
-  last_name: string;
-}
-
-interface DriverName {
-  first_name: string;
-  last_name: string;
-}
-
-interface PostResponse {
-  id: number;
-  message: string;
-}
+import { Driver, DriverName } from "../../types";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "DriverView",
@@ -27,76 +11,20 @@ export default {
       isValidNewDriver: false,
     };
   },
+  computed: {
+    ...mapGetters({
+      getDrivers: "driver/getDrivers",
+    }),
+  },
   mounted() {
     this.fetchDrivers();
   },
   methods: {
-    async fetchDrivers() {
-      try {
-        const client = api(aspida(this.$axios));
-        const response = await client.v1.drivers.get();
-
-        if (response.status === 200 && response.body) {
-          this.drivers = response.body;
-        } else {
-          throw new Error("Invalid response from server");
-        }
-      } catch (error) {
-        console.error("Error fetching drivers: ", error);
-      }
-    },
-    async addDriver() {
-      try {
-        const csrfToken = this.$store.getters["csrf/getCsrfAccessToken"];
-        const client = api(aspida(this.$axios));
-        const headers = {
-          "X-CSRF-TOKEN": csrfToken,
-        };
-        const response = await client.v1.drivers.post({
-          body: this.newDriver,
-          config: { headers },
-        });
-        console.log(response);
-
-        if (response.status === 201) {
-          const newDriverResponse: PostResponse = response.body;
-          this.drivers.push({
-            id: newDriverResponse.id,
-            ...this.newDriver,
-          });
-          this.newDriver = { first_name: "", last_name: "" };
-          this.isValidNewDriver = false;
-        } else {
-          throw new Error("Failed to add new driver");
-        }
-      } catch (error) {
-        console.log(error);
-        console.error("Error adding new driver: ", error);
-      }
-    },
-
-    async deleteDriver(driverId: number) {
-      try {
-        const csrfToken = this.$store.getters["csrf/getCsrfAccessToken"];
-        const client = api(aspida(this.$axios));
-        const headers = {
-          "X-CSRF-TOKEN": csrfToken,
-        };
-        const response = await client.v1.drivers._driverId(driverId).delete({
-          config: { headers },
-        });
-        console.log(response);
-        if (response.status === 200) {
-          this.drivers = this.drivers.filter(
-            (driver) => driver.id !== driverId
-          );
-        } else {
-          throw new Error("Failed to delete driver");
-        }
-      } catch (error) {
-        console.error("Error deleting driver: ", error);
-      }
-    },
+    ...mapActions({
+      fetchDrivers: "driver/fetchDrivers",
+      addDriver: "driver/addDriver",
+      deleteDriver: "driver/deleteDriver",
+    }),
 
     validateInput() {
       if (
@@ -135,7 +63,7 @@ export default {
 
       <button
         class="btn btn-secondary"
-        @click="addDriver"
+        @click="addDriver(newDriver)"
         :disabled="!isValidNewDriver"
       >
         追加
@@ -146,7 +74,7 @@ export default {
   <!-- 結果の表示例 -->
   <div>
     <ul>
-      <li v-for="driver in drivers" :key="driver.id">
+      <li v-for="driver in getDrivers" :key="driver.id">
         {{ driver.last_name }} {{ driver.first_name }}
         <button @click="deleteDriver(driver.id)">削除</button>
       </li>

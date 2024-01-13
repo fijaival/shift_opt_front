@@ -13,10 +13,10 @@ interface NewEmployee {
   last_name: string;
 }
 
-interface postRes {
-  id: number;
-  message: string;
-}
+// interface postRes {
+//   id: number;
+//   message: string;
+// }
 
 export default {
   name: "EmployeeView",

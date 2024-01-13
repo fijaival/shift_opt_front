@@ -39,7 +39,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!store.getters["user/isLogin"]) {
-      console.log("ewaf");
+      console.log("ログイン画面に遷移します");
       next({
         path: "/login",
         query: {
