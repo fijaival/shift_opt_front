@@ -8,7 +8,13 @@ export default {
     "./node_modules/flowbite/**/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        orange: {
+          50: "#fca",
+        },
+      },
+    },
   },
   plugins: [daisyUI],
 };
