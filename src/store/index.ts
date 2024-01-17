@@ -2,6 +2,8 @@ import { InjectionKey } from "vue";
 import { createStore, Store, useStore as baseUseStore } from "vuex";
 import { UserModule } from "./modules/user";
 import { DriverModule } from "./modules/driver";
+import { EmployeeModule } from "./modules/employees";
+import { QualificationModule } from "./modules/qualification";
 
 type RootState = {
   version: string;
@@ -14,6 +16,8 @@ export default createStore<RootState>({
   modules: {
     user: UserModule,
     driver: DriverModule,
+    employee: EmployeeModule,
+    qualification: QualificationModule,
   },
 });
 

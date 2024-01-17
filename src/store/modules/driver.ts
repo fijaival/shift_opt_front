@@ -3,7 +3,7 @@ import aspida from "@aspida/axios";
 import api from "../../../api/$api";
 import AxiosInstance from "../../lib/axios";
 
-import { DriverPostResponse } from "../../types";
+import { PostResponse } from "../../types";
 
 type RootState = {
   version: string;
@@ -60,7 +60,7 @@ const actions: ActionTree<DriverState, RootState> = {
         config: { headers },
       });
       if (response.status === 201) {
-        const newDriverResponse: DriverPostResponse = response.body;
+        const newDriverResponse: PostResponse = response.body;
         const addedDriver: Driver = {
           id: newDriverResponse.id,
           ...newDriver,
