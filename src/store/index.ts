@@ -4,6 +4,7 @@ import { UserModule } from "./modules/user";
 import { DriverModule } from "./modules/driver";
 import { EmployeeModule } from "./modules/employees";
 import { QualificationModule } from "./modules/qualification";
+import { RestrictionModule } from "./modules/restriction";
 
 type RootState = {
   version: string;
@@ -18,6 +19,7 @@ export default createStore<RootState>({
     driver: DriverModule,
     employee: EmployeeModule,
     qualification: QualificationModule,
+    restriction: RestrictionModule,
   },
 });
 

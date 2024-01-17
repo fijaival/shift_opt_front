@@ -32,8 +32,8 @@ export interface Qualification {
 
 export interface Restriction {
   id: number;
-  name: string;
-  value: number;
+  name?: string;
+  value?: number;
 }
 
 export interface Employee {
@@ -45,14 +45,10 @@ export interface Employee {
   restrictions: Restriction[] | [];
 }
 
-export interface Restrictions {
-  id: number;
-  value: number;
-}
 export interface newEmployee {
   last_name: String;
   first_name: string;
   qualifications: number[];
-  restrictions: Restrictions[];
+  restrictions: Restriction[];
   dependencies: number[];
 }

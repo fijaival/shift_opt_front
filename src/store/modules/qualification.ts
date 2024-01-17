@@ -29,7 +29,7 @@ const mutations: MutationTree<QualificationState> = {
     )),
 };
 const actions: ActionTree<QualificationState, RootState> = {
-  async fetchqualifications({ commit }) {
+  async fetchQualifications({ commit }) {
     try {
       const client = api(aspida(AxiosInstance));
       const response = await client.v1.qualifications.get();

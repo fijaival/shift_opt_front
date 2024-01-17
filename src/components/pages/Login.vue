@@ -20,12 +20,16 @@ export default {
   methods: {
     ...mapActions({
       loginAction: "user/login",
+      fetchQualifications: "qualification/fetchQualifications",
+      fetcRrestrictions: "restriction/fetcRrestrictions",
     }),
     async login() {
       await this.loginAction({
         username: this.username,
         password: this.password,
       });
+      await this.fetchQualifications();
+      await this.fetcRrestrictions();
 
       if (this.isLogin) {
         this.$router.push({
