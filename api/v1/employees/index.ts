@@ -1,28 +1,5 @@
 import type { DefineMethods } from "aspida";
-
-type Employee = {
-  id: number;
-  first_name: string;
-  last_name: string;
-};
-
-type postResBody = {
-  id: number;
-  message: string;
-};
-
-type restrictions = {
-  id: number;
-  value: number;
-};
-
-type newEmployee = {
-  last_name: String;
-  first_name: string;
-  qualifications: number[];
-  restrictions: restrictions[];
-  dependencies: number[];
-};
+import { Employee, newEmployee, PostResponse } from "../../../src/types";
 
 export type Methods = DefineMethods<{
   get: {
@@ -30,6 +7,6 @@ export type Methods = DefineMethods<{
   };
   post: {
     reqBody: newEmployee;
-    resBody: postResBody;
+    resBody: PostResponse;
   };
 }>;
