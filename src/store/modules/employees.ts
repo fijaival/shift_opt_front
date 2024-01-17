@@ -43,7 +43,7 @@ const actions: ActionTree<EmployeeState, RootState> = {
       console.error("Error fetching employees: ", error);
     }
   },
-  async addemployee({ commit }, newEmployee) {
+  async addEmployee({ commit }, newEmployee) {
     try {
       const csrfToken = localStorage.getItem("CsrfAccessToken");
       console.log(csrfToken);
@@ -61,7 +61,7 @@ const actions: ActionTree<EmployeeState, RootState> = {
           id: newEmployeeResponse.id,
           ...newEmployee,
         };
-        commit("addemployee", addedEmployee);
+        commit("addEmployee", addedEmployee);
       } else {
         throw new Error("Failed to add new employee");
       }

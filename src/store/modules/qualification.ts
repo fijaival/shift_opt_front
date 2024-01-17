@@ -93,7 +93,7 @@ const actions: ActionTree<QualificationState, RootState> = {
   },
 };
 const getters: GetterTree<QualificationState, RootState> = {
-  getDrivers: (state: QualificationState) => {
+  getQualifications: (state: QualificationState) => {
     return state.qualifications;
   },
 };

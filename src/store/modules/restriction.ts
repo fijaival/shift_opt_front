@@ -92,7 +92,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
   },
 };
 const getters: GetterTree<RestrictionState, RootState> = {
-  getDrivers: (state: RestrictionState) => {
+  getRestrictions: (state: RestrictionState) => {
     return state.restrictions;
   },
 };
