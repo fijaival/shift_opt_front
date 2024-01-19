@@ -1,9 +1,20 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
 import { newEmployee } from "../../types";
-
+import TextArea from "../parts/TextArea.vue";
+import CheckLabel from "../parts/CheckLabel.vue";
+import CheckBox from "../parts/CheckBox.vue";
+import MiddleTitle from "../parts/MiddleTitle.vue";
+import RedWhiteButton from "../parts/RedWhiteButton.vue";
 export default {
   name: "EmployeeAddModal",
+  components: {
+    TextArea,
+    CheckLabel,
+    CheckBox,
+    MiddleTitle,
+    RedWhiteButton,
+  },
   data() {
     return {
       newEmployee: {
@@ -13,7 +24,6 @@ export default {
         restrictions: [],
         dependencies: [],
       } as newEmployee,
-      isValidNewEmployee: false,
       restrictionInputs: [
         {
           selectedRestrictionId: null as number | null,
@@ -22,12 +32,19 @@ export default {
       ],
     };
   },
+
   computed: {
     ...mapGetters({
       getEmployees: "employee/getEmployees",
       getQualifications: "qualification/getQualifications",
       getRestrictions: "restriction/getRestrictions",
     }),
+    isValidNewEmployee() {
+      return (
+        this.newEmployee.first_name.trim() !== "" &&
+        this.newEmployee.last_name.trim() !== ""
+      );
+    },
   },
 
   methods: {
@@ -35,16 +52,29 @@ export default {
       addEmployee: "employee/addEmployee",
     }),
     clickEvent() {
+      this.initializeProp();
       this.$emit("from-child");
     },
     stopEvent(event: Event) {
       event.stopPropagation();
     },
-    validateInput() {
-      this.isValidNewEmployee =
-        this.newEmployee.first_name.trim() !== "" &&
-        this.newEmployee.last_name.trim() !== "";
+    initializeProp() {
+      this.newEmployee = {
+        last_name: "",
+        first_name: "",
+        qualifications: [],
+        restrictions: [],
+        dependencies: [],
+      };
+
+      this.restrictionInputs = [
+        {
+          selectedRestrictionId: null,
+          value: null,
+        },
+      ];
     },
+
     updateQualifications(qualificationId: number) {
       const index = this.newEmployee.qualifications.indexOf(qualificationId);
       if (index === -1) {
@@ -83,6 +113,8 @@ export default {
       await this.submitRestrictions();
       console.log(this.newEmployee);
       this.addEmployee(this.newEmployee);
+      this.$emit("from-child");
+
       // this.addEmployee(this.newEmployee)
     },
   },
@@ -91,72 +123,149 @@ export default {
 <template>
   <div id="overlay" @click="clickEvent">
     <div id="content" @click="stopEvent">
-      <div>
-        <input
-          v-model="newEmployee.last_name"
-          placeholder="姓"
-          @input="validateInput"
-        />
-        <input
-          v-model="newEmployee.first_name"
-          placeholder="名"
-          @input="validateInput"
-        />
-      </div>
+      <div class="mt-8 mb-8 text-left w-3/5">
+        <div class="flex justify-between">
+          <label class="text-2xl block mt-2 mb-4">新規従業員登録 </label>
+          <button @click="clickEvent">cancel</button>
+        </div>
+        <div class="mb-8">
+          <label for="name" class="text-sm block">姓 </label>
 
-      <br />
-      <div v-for="qualification in getQualifications" :key="qualification.id">
-        <input
-          type="checkbox"
-          :value="qualification.id"
-          @change="updateQualifications(qualification.id)"
-        />
-        {{ qualification.name }}
-      </div>
-      <br />
-      <div>回数制限</div>
-      <div v-for="(restrictionInput, index) in restrictionInputs" :key="index">
-        <select v-model="restrictionInput.selectedRestrictionId">
-          <option
-            v-for="restriction in getRestrictions"
-            :key="restriction.id"
-            :value="restriction.id"
+          <TextArea
+            id="lastName"
+            :modelValue="newEmployee.last_name"
+            @update:modelValue="newEmployee.last_name = $event"
+            placeholder="姓"
+            type="text"
+          ></TextArea>
+        </div>
+        <div class="mb-8">
+          <label for="name" class="text-sm block">名 </label>
+          <TextArea
+            id="name"
+            :modelValue="newEmployee.first_name"
+            @update:modelValue="newEmployee.first_name = $event"
+            placeholder="名"
+            type="text"
           >
-            {{ restriction.name }}
-          </option>
-        </select>
-        最大
-        <input
-          type="number"
-          v-model="restrictionInput.value"
-          placeholder="数値を入力"
-        />回
-        <button @click="removeRestriction(index)">削除</button>
-      </div>
-      <button @click="addRestrictionInput">+ 追加</button>
-      <br />
-      <button @click="submitRestrictions">制限を保存</button>
-
-      <div>
-        <p>必要な従業員</p>
-        <select v-model="newEmployee.dependencies[0]">
-          <option
-            v-for="employee in getEmployees"
-            :key="employee.id"
-            :value="employee.id"
+          </TextArea>
+        </div>
+        <div class="mt-4">
+          <MiddleTitle title="資格情報"></MiddleTitle>
+          <div
+            class="flex items-center mb-8 mt-4"
+            v-for="qualification in getQualifications"
+            :key="qualification.id"
           >
-            {{ employee.last_name }} {{ employee.first_name }}
-          </option>
-        </select>
-      </div>
-      <button
-        class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2"
-        @click="registerNewEmployee"
-      >
-        追加
-      </button>
+            <CheckBox
+              :key="qualification.id"
+              :qualification="qualification"
+              :updateQualifications="updateQualifications"
+            />
+            <CheckLabel
+              :for="`checkbox-${qualification.id}`"
+              :title="qualification.name"
+            ></CheckLabel>
+          </div>
+        </div>
 
-      <p><button @click="clickEvent">cancel</button></p>
+        <hr />
+        <div class="mb-4">
+          <MiddleTitle title="制約条件"></MiddleTitle>
+          <div class="mb-8">
+            <div
+              v-for="(restrictionInput, index) in restrictionInputs"
+              :key="index"
+            >
+              <div class="flex justify-center">
+                <div class="w-5/6 mt-2">
+                  <!--  -->
+                  <label for="name" class="text-base block mb-2"
+                    >・制約条件{{ index + 1 }}
+                  </label>
+                  <div class="relative h-10 w-72 min-w-[200px]">
+                    <select
+                      id="underline_select"
+                      v-model="restrictionInput.selectedRestrictionId"
+                      class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                    >
+                      <option
+                        v-for="restriction in getRestrictions"
+                        :key="restriction.id"
+                        :value="restriction.id"
+                      >
+                        {{ restriction.name }}
+                      </option>
+                    </select>
+                    <label
+                      class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500"
+                    >
+                      Select a restriction
+                    </label>
+                  </div>
+
+                  <input
+                    type="number"
+                    class="w-28 py-2 border-b focus:outline-none focus:border-b-2 focus:border-indigo-500 placeholder-gray-500 placeholder-opacity-50"
+                    v-model="restrictionInput.value"
+                    placeholder="数値を入力"
+                  />回まで
+                  <div class="mt-2">
+                    <RedWhiteButton
+                      type="button"
+                      :removeRestriction="removeRestriction"
+                      :index="index"
+                      label="ー 制約条件の削除"
+                    >
+                    </RedWhiteButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <RedWhiteButton
+            :addRestrictionInput="addRestrictionInput"
+            label="+ 制約条件の追加"
+          >
+          </RedWhiteButton>
+        </div>
+
+        <hr />
+
+        <div class="mb-12">
+          <MiddleTitle title="依存関係"></MiddleTitle>
+
+          <div class="relative h-10 w-72 min-w-[200px]">
+            <select
+              id="underline_select"
+              v-model="newEmployee.dependencies[0]"
+              class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+            >
+              <option
+                v-for="employee in getEmployees"
+                :key="employee.id"
+                :value="employee.id"
+              >
+                {{ employee.last_name }} {{ employee.first_name }}
+              </option>
+            </select>
+            <label
+              class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500"
+            >
+              Select a dependency
+            </label>
+          </div>
+        </div>
+        <div class="text-right">
+          <button
+            class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2 disabled:border-gray-300 disabled:bg-gray-300 disabled:text-gray-100"
+            @click="registerNewEmployee"
+            :disabled="!isValidNewEmployee"
+          >
+            追加
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -181,8 +290,11 @@ export default {
 }
 
 #content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 2;
-  width: 80%;
+  width: 60%;
   padding: 1em;
   background: #fff;
 }
