@@ -5,12 +5,27 @@
     :placeholder="placeholder"
     :type="type"
     :value="modelValue"
-    @input="$emit('update:modelValue', $event.target.value)"
+    @input="handleInput"
   />
 </template>
-<script>
-export default {
-  props: { modelValue: String, id: String, placeholder: String, type: String },
-  emits: ["update:modelValue"],
-};
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  props: {
+    modelValue: String,
+    id: String,
+    placeholder: String,
+    type: String,
+  },
+  emits: {
+    "update:modelValue": (_value: string) => true,
+  },
+  methods: {
+    handleInput(event: Event) {
+      const target = event.target as HTMLInputElement;
+      this.$emit("update:modelValue", target.value);
+    },
+  },
+});
 </script>

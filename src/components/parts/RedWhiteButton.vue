@@ -7,7 +7,7 @@
     {{ label }}
   </button>
 </template>
-<script>
+<script lang="ts">
 export default {
   props: {
     label: String,
@@ -17,9 +17,9 @@ export default {
   },
   methods: {
     clickButton() {
-      if (this.label == "ー 制約条件の削除") {
+      if (this.label == "ー 制約条件の削除" && this.removeRestriction) {
         this.removeRestriction(this.index);
-      } else {
+      } else if (this.addRestrictionInput) {
         this.addRestrictionInput();
       }
     },
