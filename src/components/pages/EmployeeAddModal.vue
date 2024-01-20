@@ -30,6 +30,7 @@ export default {
           value: null as number | null,
         },
       ],
+      message: "",
     };
   },
 
@@ -40,10 +41,38 @@ export default {
       getRestrictions: "restriction/getRestrictions",
     }),
     isValidNewEmployee() {
-      return (
+      const isNameValid =
         this.newEmployee.first_name.trim() !== "" &&
-        this.newEmployee.last_name.trim() !== ""
+        this.newEmployee.last_name.trim() !== "";
+
+      const areRestrictionsValid = this.restrictionInputs.every((ri) => {
+        const isSelected = ri.selectedRestrictionId !== null;
+        const isValueValid = typeof ri.value === "number" && ri.value !== null;
+        return isSelected ? isValueValid : true;
+      });
+
+      const uniqueRestrictionIds = new Set(
+        this.restrictionInputs
+          .map((ri) => ri.selectedRestrictionId)
+          .filter((id) => id !== null)
       );
+      const areRestrictionIdsUnique =
+        uniqueRestrictionIds.size ===
+        this.restrictionInputs.filter((ri) => ri.selectedRestrictionId !== null)
+          .length;
+
+      if (!areRestrictionIdsUnique) {
+        this.message = "同じ制約条件を設定できません";
+        return false;
+      } else if (!areRestrictionsValid) {
+        this.message = "制約条件の値が無効です";
+        return false;
+      } else if (!isNameValid) {
+        this.message = "名前を入力してください";
+        return false;
+      }
+      this.message = "";
+      return isNameValid && areRestrictionsValid && areRestrictionIdsUnique;
     },
   },
 
@@ -99,16 +128,7 @@ export default {
           value: ri.value as number,
         }));
     },
-    updateDependencies(dependenciesID: number) {
-      const index = this.newEmployee.dependencies.indexOf(dependenciesID);
-      if (index === -1) {
-        // 資格がまだリストにない場合、リストに追加する
-        this.newEmployee.dependencies.push(dependenciesID);
-      } else {
-        // 既にリストに存在する場合、リストから削除する
-        this.newEmployee.dependencies.splice(index, 1);
-      }
-    },
+
     async registerNewEmployee() {
       await this.submitRestrictions();
       console.log(this.newEmployee);
@@ -160,6 +180,7 @@ export default {
             <CheckBox
               :key="qualification.id"
               :qualification="qualification"
+              :qualifications="newEmployee.qualifications"
               :updateQualifications="updateQualifications"
             />
             <CheckLabel
@@ -180,7 +201,7 @@ export default {
               <div class="flex justify-center">
                 <div class="w-5/6 mt-2">
                   <!--  -->
-                  <label for="name" class="text-base block mb-2"
+                  <label class="text-base block mb-2"
                     >・制約条件{{ index + 1 }}
                   </label>
                   <div class="relative h-10 w-72 min-w-[200px]">
@@ -223,7 +244,9 @@ export default {
               </div>
             </div>
           </div>
+
           <RedWhiteButton
+            v-if="getRestrictions.length !== restrictionInputs.length"
             :addRestrictionInput="addRestrictionInput"
             label="+ 制約条件の追加"
           >
@@ -257,6 +280,7 @@ export default {
           </div>
         </div>
         <div class="text-right">
+          {{ message }}
           <button
             class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2 disabled:border-gray-300 disabled:bg-gray-300 disabled:text-gray-100"
             @click="registerNewEmployee"
