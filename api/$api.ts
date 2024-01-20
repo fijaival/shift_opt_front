@@ -3,6 +3,7 @@ import type { Methods as Methods_um4um8 } from './v1/auth/login';
 import type { Methods as Methods_moyhzr } from './v1/drivers';
 import type { Methods as Methods_vub5f7 } from './v1/drivers/_driverId@number';
 import type { Methods as Methods_zl1x3d } from './v1/employees';
+import type { Methods as Methods_180tyfv } from './v1/employees/_employeeId@number';
 import type { Methods as Methods_1im4lra } from './v1/qualifications';
 import type { Methods as Methods_1jp0ihd } from './v1/qualifications/_qualificationId@number';
 import type { Methods as Methods_1b6sftz } from './v1/restrictions';
@@ -53,6 +54,17 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
         $path: () => `${prefix}${PATH1}`,
       },
       employees: {
+        _employeeId: (val2: number) => {
+          const prefix2 = `${PATH2}/${val2}`;
+
+          return {
+            delete: (option?: { config?: T | undefined } | undefined) =>
+              fetch<Methods_180tyfv['delete']['resBody']>(prefix, prefix2, DELETE, option).json(),
+            $delete: (option?: { config?: T | undefined } | undefined) =>
+              fetch<Methods_180tyfv['delete']['resBody']>(prefix, prefix2, DELETE, option).json().then(r => r.body),
+            $path: () => `${prefix}${prefix2}`,
+          };
+        },
         get: (option?: { config?: T | undefined } | undefined) =>
           fetch<Methods_zl1x3d['get']['resBody']>(prefix, PATH2, GET, option).json(),
         $get: (option?: { config?: T | undefined } | undefined) =>

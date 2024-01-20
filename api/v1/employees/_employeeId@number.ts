@@ -1,3 +1,11 @@
 import type { DefineMethods } from "aspida";
 
-export type Methods = DefineMethods<{}>;
+type responseBody = {
+  message: string;
+};
+
+export type Methods = DefineMethods<{
+  delete: {
+    resBody: responseBody;
+  };
+}>;

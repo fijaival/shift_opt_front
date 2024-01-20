@@ -22,10 +22,10 @@ const mutations: MutationTree<EmployeeState> = {
   addEmployee: (state, newEmployee: Employee) => {
     state.employees.push(newEmployee);
   },
-  // removeEmployee: (state, id) =>
-  //   (state.employees = state.employees.filter(
-  //     (employee) => employee.id !== id
-  //   )),
+  removeEmployee: (state, id) =>
+    (state.employees = state.employees.filter(
+      (employee) => employee.id !== id
+    )),
 };
 
 const actions: ActionTree<EmployeeState, RootState> = {
@@ -70,27 +70,27 @@ const actions: ActionTree<EmployeeState, RootState> = {
       console.error("Error adding new employee: ", error);
     }
   },
-  //   async deleteemployee({ commit }, employeeId: number) {
-  //     try {
-  //       const csrfToken = localStorage.getItem("CsrfAccessToken");
-  //       const client = api(aspida(AxiosInstance));
-  //       const headers = {
-  //         "X-CSRF-TOKEN": csrfToken,
-  //       };
-  //       const response = await client.v1.employees
-  //         ._employeeId(employeeId)
-  //         .delete({
-  //           config: { headers },
-  //         });
-  //       if (response.status === 200) {
-  //         commit("removeemployee", employeeId);
-  //       } else {
-  //         throw new Error("Failed to delete employee");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error deleting employee: ", error);
-  //     }
-  //   },
+  async deleteEmployee({ commit }, employeeId: number) {
+    try {
+      const csrfToken = localStorage.getItem("CsrfAccessToken");
+      const client = api(aspida(AxiosInstance));
+      const headers = {
+        "X-CSRF-TOKEN": csrfToken,
+      };
+      const response = await client.v1.employees
+        ._employeeId(employeeId)
+        .delete({
+          config: { headers },
+        });
+      if (response.status === 200) {
+        commit("removeEmployee", employeeId);
+      } else {
+        throw new Error("Failed to delete employee");
+      }
+    } catch (error) {
+      console.error("Error deleting employee: ", error);
+    }
+  },
 };
 
 const getters: GetterTree<EmployeeState, RootState> = {
