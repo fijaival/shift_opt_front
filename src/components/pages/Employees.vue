@@ -42,6 +42,7 @@ export default {
   methods: {
     ...mapActions({
       fetchEmployes: "employee/fetchEmployees",
+      deleteEmployee: "employee/deleteEmployee",
     }),
     toggleDetails(employee: TypeOfEmployee) {
       employee.showDetails = !employee.showDetails;
@@ -71,6 +72,8 @@ export default {
         <span @click="toggleDetails(employee)">
           {{ employee.last_name }} {{ employee.first_name }}
         </span>
+        <button @click="deleteEmployee(employee.id)">削除</button>
+
         <div v-if="employee.showDetails">
           <!-- または v-show="employee.showDetails" -->
           <div>
@@ -88,11 +91,5 @@ export default {
     </button>
 
     <EmployeeAddModal v-show="showContent" @from-child="handleModal" />
-    <!-- <div id="overlay" v-show="showContent" @click="handleModal">
-      <div id="content">
-        <p>これがモーダルウィンドウです。</p>
-        <p><button @click="handleModal">close</button></p>
-      </div>
-    </div> -->
   </div>
 </template>

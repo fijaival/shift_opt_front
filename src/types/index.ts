@@ -46,7 +46,7 @@ export interface Employee {
 }
 
 export interface newEmployee {
-  last_name: String;
+  last_name: string;
   first_name: string;
   qualifications: number[];
   restrictions: Restriction[];
