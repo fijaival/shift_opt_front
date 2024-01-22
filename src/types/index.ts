@@ -45,10 +45,10 @@ export interface Employee {
   restrictions: Restriction[] | [];
 }
 
-export interface newEmployee {
+export type NewEmployee = {
   last_name: string;
   first_name: string;
   qualifications: number[];
   restrictions: Restriction[];
   dependencies: number[];
-}
+};

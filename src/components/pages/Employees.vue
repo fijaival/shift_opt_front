@@ -1,6 +1,8 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
-import EmployeeAddModal from "./EmployeeAddModal.vue";
+import type { NewEmployee, Employee } from "../../types";
+
+import EmployeeModal from "../globals/EmployeeModal.vue";
 
 interface TypeOfEmployee {
   first_name: string;
@@ -9,26 +11,24 @@ interface TypeOfEmployee {
   showDetails: boolean;
 }
 
-interface NewEmployee {
-  first_name: string;
-  last_name: string;
-}
-
-// interface postRes {
-//   id: number;
-//   message: string;
-// }
-
 export default {
   name: "EmployeeView",
   components: {
-    EmployeeAddModal, // コンポーネントをローカルに登録
+    EmployeeModal,
   },
   data() {
     return {
       Employees: [] as TypeOfEmployee[],
-      newEmployee: { first_name: "", last_name: "" } as NewEmployee,
-      showContent: false,
+      targetEmployee: {
+        last_name: "",
+        first_name: "",
+        qualifications: [],
+        restrictions: [],
+        dependencies: [],
+      } as NewEmployee,
+
+      showAddModal: false,
+      showUpdateModal: false,
     };
   },
   computed: {
@@ -43,29 +43,57 @@ export default {
     ...mapActions({
       fetchEmployes: "employee/fetchEmployees",
       deleteEmployee: "employee/deleteEmployee",
+      addEmployee: "employee/addEmployee",
     }),
     toggleDetails(employee: TypeOfEmployee) {
       employee.showDetails = !employee.showDetails;
     },
-    handleModal() {
-      this.showContent = !this.showContent;
+    handleAddModal() {
+      this.showAddModal = !this.showAddModal;
+    },
+    initializeState() {
+      this.targetEmployee = {
+        last_name: "",
+        first_name: "",
+        qualifications: [],
+        restrictions: [],
+        dependencies: [],
+      };
+    },
+    setTargetEmployee(employee: Employee) {
+      // 更新するターゲットをtargetEmployeeにセットする
+      if (!this.showUpdateModal) {
+        this.targetEmployee.first_name = employee.first_name;
+        this.targetEmployee.last_name = employee.last_name;
+        employee.dependencies.map((dep) => {
+          this.targetEmployee.qualifications.push(dep.id);
+        });
+        employee.qualifications.map((qual) => {
+          if (qual.id) {
+            this.targetEmployee.qualifications.push(qual.id);
+          }
+        });
+        employee.restrictions.map((rest) => {
+          const tmpRest = { id: rest.id, value: rest.value };
+          this.targetEmployee.restrictions.push(tmpRest);
+        });
+      } else {
+        this.initializeState();
+      }
+      console.log(this.targetEmployee);
+    },
+    async handleUpdateModal(employee: Employee) {
+      this.setTargetEmployee(employee);
+      this.showUpdateModal = !this.showUpdateModal;
+    },
+    removeEmployee(employeeId: number) {
+      this.deleteEmployee(employeeId);
     },
   },
 };
 </script>
 
 <template>
-  <!-- <p class="bg-blue-200 text-2xl p-4">Hello World!</p> -->
-  <!-- <div class="container mx-auto mt-4"> -->
-  <!-- <button class="btn btn-primary" @click="fetchEmployes">結果を出力</button> -->
-
-  <!-- <div>
-    <input v-model="newEmployee.first_name" placeholder="名前" />
-    <input v-model="newEmployee.last_name" placeholder="苗字" />
-    <button class="btn btn-secondary" @click="addEmployee">追加</button>
-  </div> -->
-
-  <!-- 結果の表示例 -->
   <div>
     <ul>
       <li v-for="employee in getEmployees" :key="employee.id">
@@ -73,9 +101,9 @@ export default {
           {{ employee.last_name }} {{ employee.first_name }}
         </span>
         <button @click="deleteEmployee(employee.id)">削除</button>
+        <button @click="handleUpdateModal(employee)">更新</button>
 
         <div v-if="employee.showDetails">
-          <!-- または v-show="employee.showDetails" -->
           <div>
             {{ employee.id }}{{ employee.dependencies }}
             {{ employee.qualifications }}{{ employee.restrictions }}
@@ -85,11 +113,29 @@ export default {
     </ul>
     <button
       class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2"
-      @click="handleModal"
+      @click="handleAddModal"
     >
       従業員を追加
     </button>
 
-    <EmployeeAddModal v-show="showContent" @from-child="handleModal" />
+    <EmployeeModal
+      v-show="showAddModal"
+      v-if="!targetEmployee.first_name"
+      @closeModal="handleAddModal"
+      :employee="targetEmployee"
+      title="新規従業員登録"
+      buttonTitle="追加"
+      :handleEmployee="addEmployee"
+    />
+
+    <EmployeeModal
+      v-show="showUpdateModal"
+      v-if="targetEmployee.first_name"
+      @closeModal="handleUpdateModal"
+      :employee="targetEmployee"
+      title="従業員情報の更新"
+      buttonTitle="更新"
+      :handleEmployee="addEmployee"
+    />
   </div>
 </template>

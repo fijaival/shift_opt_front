@@ -1,13 +1,14 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
-import { newEmployee } from "../../types";
+import type { NewEmployee } from "../../types";
 import TextArea from "../parts/TextArea.vue";
 import CheckLabel from "../parts/CheckLabel.vue";
 import CheckBox from "../parts/CheckBox.vue";
 import MiddleTitle from "../parts/MiddleTitle.vue";
 import RedWhiteButton from "../parts/RedWhiteButton.vue";
+
 export default {
-  name: "EmployeeAddModal",
+  name: "EmployeeModal",
   components: {
     TextArea,
     CheckLabel,
@@ -15,25 +16,36 @@ export default {
     MiddleTitle,
     RedWhiteButton,
   },
+  props: {
+    employee: {
+      type: Object as () => NewEmployee,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    buttonTitle: {
+      type: String,
+      required: true,
+    },
+    handleEmployee: {
+      type: Function,
+      required: true,
+    },
+  },
   data() {
     return {
-      newEmployee: {
-        last_name: "",
-        first_name: "",
-        qualifications: [],
-        restrictions: [],
-        dependencies: [],
-      } as newEmployee,
-      restrictionInputs: [
+      message: "",
+      targetEmployee: this.employee,
+      localRestrictionInputs: [
         {
           selectedRestrictionId: null as number | null,
           value: null as number | null,
         },
       ],
-      message: "",
     };
   },
-
   computed: {
     ...mapGetters({
       getEmployees: "employee/getEmployees",
@@ -42,24 +54,25 @@ export default {
     }),
     isValidNewEmployee() {
       const isNameValid =
-        this.newEmployee.first_name.trim() !== "" &&
-        this.newEmployee.last_name.trim() !== "";
+        this.targetEmployee.first_name.trim() !== "" &&
+        this.targetEmployee.last_name.trim() !== "";
 
-      const areRestrictionsValid = this.restrictionInputs.every((ri) => {
+      const areRestrictionsValid = this.localRestrictionInputs.every((ri) => {
         const isSelected = ri.selectedRestrictionId !== null;
         const isValueValid = typeof ri.value === "number" && ri.value !== null;
         return isSelected ? isValueValid : true;
       });
 
       const uniqueRestrictionIds = new Set(
-        this.restrictionInputs
+        this.localRestrictionInputs
           .map((ri) => ri.selectedRestrictionId)
           .filter((id) => id !== null)
       );
       const areRestrictionIdsUnique =
         uniqueRestrictionIds.size ===
-        this.restrictionInputs.filter((ri) => ri.selectedRestrictionId !== null)
-          .length;
+        this.localRestrictionInputs.filter(
+          (ri) => ri.selectedRestrictionId !== null
+        ).length;
 
       if (!areRestrictionIdsUnique) {
         this.message = "同じ制約条件を設定できません";
@@ -75,20 +88,19 @@ export default {
       return isNameValid && areRestrictionsValid && areRestrictionIdsUnique;
     },
   },
-
   methods: {
     ...mapActions({
       addEmployee: "employee/addEmployee",
     }),
     clickEvent() {
       this.initializeProp();
-      this.$emit("from-child");
+      this.$emit("closeModal");
     },
     stopEvent(event: Event) {
       event.stopPropagation();
     },
     initializeProp() {
-      this.newEmployee = {
+      this.targetEmployee = {
         last_name: "",
         first_name: "",
         qualifications: [],
@@ -96,32 +108,34 @@ export default {
         dependencies: [],
       };
 
-      this.restrictionInputs = [
+      this.localRestrictionInputs = [
         {
           selectedRestrictionId: null,
           value: null,
         },
       ];
     },
-
     updateQualifications(qualificationId: number) {
-      const index = this.newEmployee.qualifications.indexOf(qualificationId);
+      const index = this.targetEmployee.qualifications.indexOf(qualificationId);
       if (index === -1) {
         // 資格がまだリストにない場合、リストに追加する
-        this.newEmployee.qualifications.push(qualificationId);
+        this.targetEmployee.qualifications.push(qualificationId);
       } else {
         // 既にリストに存在する場合、リストから削除する
-        this.newEmployee.qualifications.splice(index, 1);
+        this.targetEmployee.qualifications.splice(index, 1);
       }
     },
     addRestrictionInput() {
-      this.restrictionInputs.push({ selectedRestrictionId: null, value: null });
+      this.localRestrictionInputs.push({
+        selectedRestrictionId: null,
+        value: null,
+      });
     },
     removeRestriction(index: any) {
-      this.restrictionInputs.splice(index, 1);
+      this.localRestrictionInputs.splice(index, 1);
     },
     async submitRestrictions() {
-      this.newEmployee.restrictions = this.restrictionInputs
+      this.targetEmployee.restrictions = this.localRestrictionInputs
         .filter((ri) => ri.selectedRestrictionId !== null && ri.value !== null)
         .map((ri) => ({
           id: ri.selectedRestrictionId as number,
@@ -131,21 +145,25 @@ export default {
 
     async registerNewEmployee() {
       await this.submitRestrictions();
-      console.log(this.newEmployee);
-      this.addEmployee(this.newEmployee);
-      this.$emit("from-child");
+      console.log(this.targetEmployee);
+      //   this.addEmployee(this.targetEmployee);
+      // 親側でapi処理してもろて
+      this.handleEmployee(this.targetEmployee);
+      this.$emit("closeModal");
+      this.initializeProp();
 
-      // this.addEmployee(this.newEmployee)
+      // this.addEmployee(this.targetEmployee)
     },
   },
 };
 </script>
+
 <template>
   <div id="overlay" @click="clickEvent">
     <div id="content" @click="stopEvent">
       <div class="mt-8 mb-8 text-left w-3/5">
         <div class="flex justify-between">
-          <label class="text-2xl block mt-2 mb-4">新規従業員登録 </label>
+          <label class="text-2xl block mt-2 mb-4">{{ title }} </label>
           <button @click="clickEvent">cancel</button>
         </div>
         <div class="mb-8">
@@ -153,8 +171,8 @@ export default {
 
           <TextArea
             id="lastName"
-            :modelValue="newEmployee.last_name"
-            @update:modelValue="newEmployee.last_name = $event"
+            :modelValue="targetEmployee.last_name"
+            @update:modelValue="targetEmployee.last_name = $event"
             placeholder="姓"
             type="text"
           ></TextArea>
@@ -163,8 +181,8 @@ export default {
           <label for="name" class="text-sm block">名 </label>
           <TextArea
             id="name"
-            :modelValue="newEmployee.first_name"
-            @update:modelValue="newEmployee.first_name = $event"
+            :modelValue="targetEmployee.first_name"
+            @update:modelValue="targetEmployee.first_name = $event"
             placeholder="名"
             type="text"
           >
@@ -180,7 +198,7 @@ export default {
             <CheckBox
               :key="qualification.id"
               :qualification="qualification"
-              :qualifications="newEmployee.qualifications"
+              :qualifications="targetEmployee.qualifications"
               :updateQualifications="updateQualifications"
             />
             <CheckLabel
@@ -195,7 +213,7 @@ export default {
           <MiddleTitle title="制約条件"></MiddleTitle>
           <div class="mb-8">
             <div
-              v-for="(restrictionInput, index) in restrictionInputs"
+              v-for="(restrictionInput, index) in localRestrictionInputs"
               :key="index"
             >
               <div class="flex justify-center">
@@ -246,7 +264,7 @@ export default {
           </div>
 
           <RedWhiteButton
-            v-if="getRestrictions.length !== restrictionInputs.length"
+            v-if="getRestrictions.length !== localRestrictionInputs.length"
             :addRestrictionInput="addRestrictionInput"
             label="+ 制約条件の追加"
           >
@@ -261,7 +279,7 @@ export default {
           <div class="relative h-10 w-72 min-w-[200px]">
             <select
               id="underline_select"
-              v-model="newEmployee.dependencies[0]"
+              v-model="targetEmployee.dependencies[0]"
               class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
             >
               <option
@@ -286,7 +304,7 @@ export default {
             @click="registerNewEmployee"
             :disabled="!isValidNewEmployee"
           >
-            追加
+            {{ buttonTitle }}
           </button>
         </div>
       </div>
