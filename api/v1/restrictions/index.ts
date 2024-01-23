@@ -1,12 +1,17 @@
-import { Restriction, PostResponse } from "../../../src/types";
+import { PostResponse } from "../../../src/types";
+import {
+  RestrictionsGetBody,
+  RestrictionsPostBody,
+} from "../../../src/types/axios";
+
 import type { DefineMethods } from "aspida";
 
 export type Methods = DefineMethods<{
   get: {
-    resBody: Restriction[];
+    resBody: RestrictionsGetBody[];
   };
   post: {
-    reqBody: Restriction;
+    reqBody: RestrictionsPostBody;
     resBody: PostResponse;
   };
 }>;

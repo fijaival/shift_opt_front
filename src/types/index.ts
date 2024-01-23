@@ -1,54 +1,40 @@
+export interface Driver {
+  id: number;
+  first_name: string;
+  last_name: string;
+}
+
+export type DriversType = Driver[];
+
 export interface PostResponse {
   id: number;
   message: string;
 }
 
-export interface Driver {
-  id: number;
-  firstName: string;
-  lastName: string;
-}
-
-export interface DriverName {
-  first_name: string;
-  last_name: string;
-}
-
-export interface Employee {
-  id: number;
-  first_name: string;
-  last_name: string;
-}
-export interface Dependency {
+export interface Dependnecy {
   first_name: string;
   id: number;
   last_name: string;
 }
 
 export interface Qualification {
-  id?: number;
+  id: number;
   name: string;
 }
 
 export interface Restriction {
   id: number;
-  name?: string;
-  value?: number;
+  name: string;
+  value: number;
 }
 
 export interface Employee {
-  dependencies: Dependency[] | [];
+  dependencies: Dependnecy[];
   first_name: string;
   id: number;
   last_name: string;
-  qualifications: Qualification[] | [];
-  restrictions: Restriction[] | [];
+  qualifications: Qualification[];
+  restrictions: Restriction[];
 }
 
-export type NewEmployee = {
-  last_name: string;
-  first_name: string;
-  qualifications: number[];
-  restrictions: Restriction[];
-  dependencies: number[];
-};
+export type EmployeesType = Employee[];

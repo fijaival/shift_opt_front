@@ -1,12 +1,13 @@
 import type { DefineMethods } from "aspida";
-import { Employee, newEmployee, PostResponse } from "../../../src/types";
+import { EmployeesType, PostResponse } from "../../../src/types";
+import { EmployeePostBody } from "../../../src/types/axios";
 
 export type Methods = DefineMethods<{
   get: {
-    resBody: Employee[];
+    resBody: EmployeesType;
   };
   post: {
-    reqBody: newEmployee;
+    reqBody: EmployeePostBody;
     resBody: PostResponse;
   };
 }>;
