@@ -1,3 +1,5 @@
+import { EmployeePostBody } from "./axios";
+
 export interface Driver {
   id: number;
   first_name: string;
@@ -35,6 +37,10 @@ export interface Employee {
   last_name: string;
   qualifications: Qualification[];
   restrictions: Restriction[];
+}
+
+export interface EmployeeModal extends EmployeePostBody {
+  id?: number; // 'id' を任意のプロパティとしてオーバーライド
 }
 
 export type EmployeesType = Employee[];

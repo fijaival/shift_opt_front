@@ -1,13 +1,13 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
-import type { NewEmployee, Employee } from "../../types";
+import type { EmployeePostBody } from "../../types/axios";
+import { Employee } from "../../types";
 
 import EmployeeModal from "../globals/EmployeeModal.vue";
+import EmployeeItem from "../parts/EmployeeItem.vue";
 
-interface TypeOfEmployee {
-  first_name: string;
+interface ShowDetail {
   id: number;
-  last_name: string;
   showDetails: boolean;
 }
 
@@ -15,17 +15,17 @@ export default {
   name: "EmployeeView",
   components: {
     EmployeeModal,
+    EmployeeItem,
   },
   data() {
     return {
-      Employees: [] as TypeOfEmployee[],
       targetEmployee: {
         last_name: "",
         first_name: "",
         qualifications: [],
         restrictions: [],
         dependencies: [],
-      } as NewEmployee,
+      } as EmployeePostBody,
 
       showAddModal: false,
       showUpdateModal: false,
@@ -45,7 +45,7 @@ export default {
       deleteEmployee: "employee/deleteEmployee",
       addEmployee: "employee/addEmployee",
     }),
-    toggleDetails(employee: TypeOfEmployee) {
+    toggleDetails(employee: ShowDetail) {
       employee.showDetails = !employee.showDetails;
     },
     handleAddModal() {
@@ -63,32 +63,24 @@ export default {
     setTargetEmployee(employee: Employee) {
       // 更新するターゲットをtargetEmployeeにセットする
       if (!this.showUpdateModal) {
-        this.targetEmployee.first_name = employee.first_name;
-        this.targetEmployee.last_name = employee.last_name;
-        employee.dependencies.map((dep) => {
-          this.targetEmployee.qualifications.push(dep.id);
-        });
-        employee.qualifications.map((qual) => {
-          if (qual.id) {
-            this.targetEmployee.qualifications.push(qual.id);
-          }
-        });
-        employee.restrictions.map((rest) => {
-          const tmpRest = { id: rest.id, value: rest.value };
-          this.targetEmployee.restrictions.push(tmpRest);
-        });
+        this.targetEmployee = JSON.parse(JSON.stringify(employee)); //employeeにはidがあるがこれでいいのか
+        console.log(employee.id);
       } else {
+        console.log("EmployeesのtargetEmployeeの初期化");
         this.initializeState();
       }
-      console.log(this.targetEmployee);
     },
     async handleUpdateModal(employee: Employee) {
+      console.log(employee);
       this.setTargetEmployee(employee);
       this.showUpdateModal = !this.showUpdateModal;
     },
     removeEmployee(employeeId: number) {
       this.deleteEmployee(employeeId);
     },
+  },
+  upDateEmployees() {
+    // ここで条件分岐して
   },
 };
 </script>
@@ -97,18 +89,11 @@ export default {
   <div>
     <ul>
       <li v-for="employee in getEmployees" :key="employee.id">
-        <span @click="toggleDetails(employee)">
-          {{ employee.last_name }} {{ employee.first_name }}
-        </span>
-        <button @click="deleteEmployee(employee.id)">削除</button>
-        <button @click="handleUpdateModal(employee)">更新</button>
-
-        <div v-if="employee.showDetails">
-          <div>
-            {{ employee.id }}{{ employee.dependencies }}
-            {{ employee.qualifications }}{{ employee.restrictions }}
-          </div>
-        </div>
+        <EmployeeItem
+          :employee="employee"
+          :deleteEmployee="deleteEmployee"
+          :handleUpdateModal="handleUpdateModal"
+        />
       </li>
     </ul>
     <button
@@ -120,7 +105,6 @@ export default {
 
     <EmployeeModal
       v-show="showAddModal"
-      v-if="!targetEmployee.first_name"
       @closeModal="handleAddModal"
       :employee="targetEmployee"
       title="新規従業員登録"
@@ -130,7 +114,6 @@ export default {
 
     <EmployeeModal
       v-show="showUpdateModal"
-      v-if="targetEmployee.first_name"
       @closeModal="handleUpdateModal"
       :employee="targetEmployee"
       title="従業員情報の更新"

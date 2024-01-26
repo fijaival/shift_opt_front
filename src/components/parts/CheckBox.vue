@@ -9,6 +9,7 @@
   />
 </template>
 <script lang="ts">
+import type { Qualification } from "../../types";
 export default {
   props: {
     id: String,
@@ -16,8 +17,8 @@ export default {
       type: Object,
       required: true,
     },
-    qualifications: {
-      type: Array,
+    qualified: {
+      type: Array as () => Qualification[],
       required: true,
     },
     updateQualifications: {
@@ -27,12 +28,16 @@ export default {
   },
   computed: {
     isChecked() {
-      return this.qualifications.includes(this.qualification.id);
+      const index = this.qualified.findIndex(
+        (q) => q.id === this.qualification.id
+      );
+      return index > -1;
     },
   },
   methods: {
     handleChange() {
-      this.updateQualifications(this.qualification.id);
+      console.log(this.qualified);
+      this.updateQualifications(this.qualification);
     },
   },
 };

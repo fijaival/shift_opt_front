@@ -3,14 +3,15 @@ import aspida from "@aspida/axios";
 import api from "../../../api/$api";
 import AxiosInstance from "../../lib/axios";
 
-import { Employee, PostResponse } from "../../types";
+import { PostResponse, Employee, EmployeesType } from "../../types";
+import { EmployeePostBody } from "../../types/axios";
 
 type RootState = {
   version: string;
 };
 
 interface EmployeeState {
-  employees: Employee[];
+  employees: EmployeesType;
 }
 
 const state: EmployeeState = {
@@ -18,11 +19,12 @@ const state: EmployeeState = {
 };
 
 const mutations: MutationTree<EmployeeState> = {
-  setEmployees: (state, employees) => (state.employees = employees),
+  setEmployees: (state, employees: EmployeesType) =>
+    (state.employees = employees),
   addEmployee: (state, newEmployee: Employee) => {
     state.employees.push(newEmployee);
   },
-  removeEmployee: (state, id) =>
+  removeEmployee: (state, id: number) =>
     (state.employees = state.employees.filter(
       (employee) => employee.id !== id
     )),
@@ -43,7 +45,8 @@ const actions: ActionTree<EmployeeState, RootState> = {
       console.error("Error fetching employees: ", error);
     }
   },
-  async addEmployee({ commit }, newEmployee) {
+
+  async addEmployee({ commit }, newEmployee: EmployeePostBody) {
     try {
       const csrfToken = localStorage.getItem("CsrfAccessToken");
       console.log(csrfToken);
@@ -56,6 +59,7 @@ const actions: ActionTree<EmployeeState, RootState> = {
         config: { headers },
       });
       if (response.status === 201) {
+        // stateのEmployeeとpostするときに
         const newEmployeeResponse: PostResponse = response.body;
         const addedEmployee: Employee = {
           id: newEmployeeResponse.id,

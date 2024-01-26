@@ -11,16 +11,17 @@
 export default {
   props: {
     label: String,
-    removeRestriction: { type: Function, required: false },
-    addRestrictionInput: { type: Function, required: false },
+    removeItem: { type: Function, required: false },
+    addInput: { type: Function, required: false },
     index: { type: Number, required: false },
   },
   methods: {
     clickButton() {
-      if (this.label == "ー 制約条件の削除" && this.removeRestriction) {
-        this.removeRestriction(this.index);
-      } else if (this.addRestrictionInput) {
-        this.addRestrictionInput();
+      console.log(this.index);
+      if (this.removeItem) {
+        this.removeItem(this.index);
+      } else if (this.addInput) {
+        this.addInput();
       }
     },
   },

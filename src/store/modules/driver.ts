@@ -3,20 +3,15 @@ import aspida from "@aspida/axios";
 import api from "../../../api/$api";
 import AxiosInstance from "../../lib/axios";
 
-import { PostResponse } from "../../types";
+import { Driver, DriversType, PostResponse } from "../../types";
+import { DriverPostBody } from "@/types/axios";
 
 type RootState = {
   version: string;
 };
 
-interface Driver {
-  id: number;
-  first_name: string;
-  last_name: string;
-}
-
 interface DriverState {
-  drivers: Driver[];
+  drivers: DriversType;
 }
 
 const state: DriverState = {
@@ -24,7 +19,7 @@ const state: DriverState = {
 };
 
 const mutations: MutationTree<DriverState> = {
-  setDrivers: (state, drivers) => (state.drivers = drivers),
+  setDrivers: (state, drivers: DriversType) => (state.drivers = drivers),
   addDriver: (state, newDriver: Driver) => {
     state.drivers.push(newDriver);
   },
@@ -47,7 +42,7 @@ const actions: ActionTree<DriverState, RootState> = {
       console.error("Error fetching drivers: ", error);
     }
   },
-  async addDriver({ commit }, newDriver) {
+  async addDriver({ commit }, newDriver: DriverPostBody) {
     try {
       const csrfToken = localStorage.getItem("CsrfAccessToken");
       console.log(csrfToken);

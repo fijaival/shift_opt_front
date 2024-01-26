@@ -13,16 +13,13 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    modelValue: String,
-    id: String,
-    placeholder: String,
-    type: String,
-  },
-  emits: {
-    "update:modelValue": (_value: string) => true,
+    id: { type: String, required: true },
+    modelValue: { type: String, required: true },
+    placeholder: { type: String, required: false },
+    type: { type: String, required: true },
   },
   methods: {
-    handleInput(event: Event) {
+    handleInput: function (event: Event) {
       const target = event.target as HTMLInputElement;
       this.$emit("update:modelValue", target.value);
     },
