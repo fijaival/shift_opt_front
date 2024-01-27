@@ -1,11 +1,12 @@
-import { Dependnecy, Qualification, Restriction } from ".";
+import { Dependencies, EmployeeQualification, EmployeeRestriction } from ".";
 
 export interface EmployeePostBody {
-  dependencies: Dependnecy[];
+  dependencies: Dependencies[];
   first_name: string;
   last_name: string;
-  qualifications: Qualification[];
-  restrictions: Restriction[];
+  qualifications: EmployeeQualification[];
+  restrictions: EmployeeRestriction[];
+  [key: string]: any;
 }
 
 export interface DriverPostBody {

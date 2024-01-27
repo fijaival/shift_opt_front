@@ -2,11 +2,11 @@
 import { mapActions, mapGetters } from "vuex";
 import type {
   Employee,
-  Qualification,
   Restriction,
-  EmployeeModal,
+  EmployeeQualification,
+  EmployeeRestriction,
+  Dependencies,
 } from "../../types";
-import type { EmployeePostBody } from "../../types/axios";
 import TextArea from "../parts/TextArea.vue";
 import CheckLabel from "../parts/CheckLabel.vue";
 import CheckBox from "../parts/CheckBox.vue";
@@ -24,18 +24,16 @@ export default {
   },
   props: {
     employee: {
-      type: Object as () => EmployeePostBody,
+      type: Object as () => Employee,
+      required: false,
+    },
+
+    saveEmployee: {
+      type: Function,
       required: true,
     },
-    title: {
-      type: String,
-      required: true,
-    },
-    buttonTitle: {
-      type: String,
-      required: true,
-    },
-    handleEmployee: {
+
+    closeModal: {
       type: Function,
       required: true,
     },
@@ -43,18 +41,20 @@ export default {
   data() {
     return {
       message: "",
-      targetEmployee: JSON.parse(
-        JSON.stringify(this.employee)
-      ) as EmployeeModal,
+      originalEmployee: this.isNewEmployee()
+        ? null
+        : JSON.parse(JSON.stringify(this.employee)),
+      targetEmployee: this.isNewEmployee()
+        ? this.initializeNewEmployee()
+        : (JSON.parse(JSON.stringify(this.employee)) as Employee),
     };
   },
   watch: {
     employee: {
       immediate: true,
-      handler(newEmployee: EmployeePostBody) {
-        this.targetEmployee = newEmployee;
-
-        console.log(this.targetEmployee);
+      handler(newEmployee: Employee) {
+        this.targetEmployee = JSON.parse(JSON.stringify(newEmployee));
+        this.originalEmployee = JSON.parse(JSON.stringify(newEmployee));
       },
     },
   },
@@ -66,40 +66,53 @@ export default {
       getRestrictions: "restriction/getRestrictions",
     }),
     isValidNewEmployee() {
+      if (!this.isNewEmployee()) {
+        if (
+          JSON.stringify(this.targetEmployee) ===
+          JSON.stringify(this.originalEmployee)
+        ) {
+          return false;
+        }
+      }
       const isNameValid =
         this.targetEmployee.first_name.trim() !== "" &&
         this.targetEmployee.last_name.trim() !== "";
       const areRestrictionsValid = this.targetEmployee.restrictions.every(
-        (ri) => {
-          const isSelected = ri.id !== null;
+        (ri: EmployeeRestriction) => {
+          const isSelected = ri.restricton_id !== null;
           const isValueValid = typeof ri.value === "number" && ri.value! >= 1;
           return isSelected ? isValueValid : true;
         }
       );
       const uniqueRestrictionIds = new Set(
         this.targetEmployee.restrictions
-          .map((ri) => ri.id)
-          .filter((id) => id !== null)
+          .map((ri: EmployeeRestriction) => ri.restricton_id)
+          .filter((restricton_id: number) => restricton_id !== null)
       );
       const areRestrictionIdsUnique =
         uniqueRestrictionIds.size ===
-        this.targetEmployee.restrictions.filter((ri) => ri.id !== null).length;
+        this.targetEmployee.restrictions.filter(
+          (ri: EmployeeRestriction) => ri.restricton_id !== null
+        ).length;
 
       const uniqueDependency = new Set(
         this.targetEmployee.dependencies
-          .map((dep) => dep.id)
-          .filter((id) => id !== null)
+          .map((dep: Dependencies) => dep.required_employee_id)
+          .filter(
+            (required_employee_id: number) => required_employee_id !== null
+          )
       );
       const areDependenciesUnique =
         uniqueDependency.size ===
-        this.targetEmployee.dependencies.filter((dep) => dep.id !== null)
-          .length;
-      console.log(this.targetEmployee.id);
+        this.targetEmployee.dependencies.filter(
+          (dep: Dependencies) => dep.required_employee_id !== null
+        ).length;
 
       if (this.targetEmployee.id) {
         if (
           this.targetEmployee.dependencies.some(
-            (dep) => dep.id == this.targetEmployee.id
+            (dep: Dependencies) =>
+              dep.required_employee_id == this.targetEmployee.id
           )
         ) {
           this.message = "自身を依存関係に登録できません";
@@ -121,23 +134,25 @@ export default {
       }
       this.message = "";
       return isNameValid && areRestrictionsValid && areRestrictionIdsUnique;
-      return true;
     },
   },
   methods: {
+    isNewEmployee() {
+      return !this.employee?.id;
+    },
     ...mapActions({
       addEmployee: "employee/addEmployee",
     }),
     clickEvent() {
       console.log("employeeModalでの初期化");
-      this.initializeProp();
-      this.$emit("closeModal");
+      // this.initializeProp();
+      this.closeModal();
     },
     stopEvent(event: Event) {
       event.stopPropagation();
     },
-    initializeProp() {
-      this.targetEmployee = {
+    initializeNewEmployee() {
+      return {
         last_name: "",
         first_name: "",
         qualifications: [],
@@ -146,31 +161,31 @@ export default {
       };
     },
 
-    updateQualifications(qualification: Qualification) {
-      console.log(qualification);
-      console.log(this.targetEmployee.qualifications);
+    updateQualifications(newQualification: EmployeeQualification) {
       const index = this.targetEmployee.qualifications.findIndex(
-        (q) => q.id === qualification.id
+        (qual: EmployeeQualification) =>
+          qual.qualification_id === newQualification.qualification_id
       );
       if (index > -1) {
         const array = this.targetEmployee.qualifications.filter(
-          (qual) => qual !== qualification
+          (qual: EmployeeQualification) =>
+            qual.qualification_id !== newQualification.qualification_id
         );
         this.targetEmployee.qualifications = array;
       } else {
-        this.targetEmployee.qualifications.push(qualification);
+        this.targetEmployee.qualifications.push(newQualification);
       }
     },
     addRestrictionInput() {
       this.targetEmployee.restrictions.push({
-        id: -1,
+        restricton_id: -1,
         name: "",
         value: 0,
       });
     },
     addDependency() {
       this.targetEmployee.dependencies.push({
-        id: -1,
+        required_employee_id: -1,
         first_name: "",
         last_name: "",
       });
@@ -202,14 +217,8 @@ export default {
     },
 
     async registerNewEmployee() {
-      console.log(this.targetEmployee);
-      //   this.addEmployee(this.targetEmployee);
-      // 親側でapi処理してもろて
-      this.handleEmployee(this.targetEmployee);
-      this.$emit("closeModal");
-      this.initializeProp();
-
-      // this.addEmployee(this.targetEmployee)
+      this.saveEmployee(this.targetEmployee);
+      this.closeModal();
     },
   },
 };
@@ -220,7 +229,9 @@ export default {
     <div id="content" @click="stopEvent">
       <div class="mt-8 mb-8 text-left w-3/5">
         <div class="flex justify-between">
-          <label class="text-2xl block mt-2 mb-4">{{ title }} </label>
+          <label class="text-2xl block mt-2 mb-4"
+            >{{ isNewEmployee() ? "新規従業員登録" : "従業員更新" }}
+          </label>
           <button @click="clickEvent">cancel</button>
         </div>
         <div class="mb-8">
@@ -280,8 +291,10 @@ export default {
                   <div class="relative h-10 w-72 min-w-[200px]">
                     <select
                       id="underline_select"
-                      v-model="existingRest.id"
-                      @change="updateRestrictionName(index, existingRest.id)"
+                      v-model="existingRest.restricton_id"
+                      @change="
+                        updateRestrictionName(index, existingRest.restricton_id)
+                      "
                       class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                     >
                       <option
@@ -333,7 +346,7 @@ export default {
           <MiddleTitle title="依存関係"></MiddleTitle>
           <div class="mb-8">
             <div
-              v-for="(qual, index) in targetEmployee.dependencies"
+              v-for="(dep, index) in targetEmployee.dependencies"
               :key="index"
             >
               <div class="flex justify-center">
@@ -341,8 +354,10 @@ export default {
                   <div class="mb-2 relative h-10 w-72 min-w-[200px]">
                     <select
                       id="underline_select"
-                      v-model="qual.id"
-                      @change="updateCaregiverName(index, qual.id)"
+                      v-model="dep.required_employee_id"
+                      @change="
+                        updateCaregiverName(index, dep.required_employee_id)
+                      "
                       class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                     >
                       <option
@@ -388,7 +403,7 @@ export default {
             @click="registerNewEmployee"
             :disabled="!isValidNewEmployee"
           >
-            {{ buttonTitle }}
+            {{ isNewEmployee() ? "登録" : "更新" }}
           </button>
         </div>
       </div>

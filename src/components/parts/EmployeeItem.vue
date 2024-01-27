@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Employee } from "../..//types";
 export default {
   data() {
     return {
@@ -7,14 +8,19 @@ export default {
   },
   props: {
     employee: {
-      type: Object,
+      type: Object as () => Employee,
       required: true,
     },
     deleteEmployee: {
       type: Function,
       required: true,
     },
-    handleUpdateModal: {
+
+    setTargetEmployee: {
+      type: Function,
+      required: true,
+    },
+    setShowModal: {
       type: Function,
       required: true,
     },
@@ -24,6 +30,10 @@ export default {
     toggleDetails() {
       this.showDetail = !this.showDetail;
     },
+    handleModal(employee: Employee) {
+      this.setTargetEmployee(employee);
+      this.setShowModal();
+    },
   },
 };
 </script>
@@ -32,12 +42,20 @@ export default {
     {{ employee.last_name }} {{ employee.first_name }}
   </span>
   <button @click="deleteEmployee(employee.id)">削除</button>
-  <button @click="handleUpdateModal(employee)">更新</button>
+  <button @click="handleModal(employee)">更新</button>
 
   <div v-if="showDetail">
     <div>
-      {{ employee.id }}{{ employee.dependencies }} {{ employee.qualifications
-      }}{{ employee.restrictions }}
+      {{ employee.id }}
+      <div>
+        依存関係{{ employee.dependencies.length }}：{{ employee.dependencies }}
+      </div>
+      <div>
+        資格{{ employee.qualifications.length }}:{{ employee.qualifications }}
+      </div>
+      <div>
+        制約条件{{ employee.restrictions.length }}: {{ employee.restrictions }}
+      </div>
     </div>
   </div>
 </template>

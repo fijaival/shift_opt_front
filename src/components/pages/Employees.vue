@@ -1,7 +1,6 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
-import type { EmployeePostBody } from "../../types/axios";
-import { Employee } from "../../types";
+import { Employee, ChaseChange } from "../../types";
 
 import EmployeeModal from "../globals/EmployeeModal.vue";
 import EmployeeItem from "../parts/EmployeeItem.vue";
@@ -25,10 +24,9 @@ export default {
         qualifications: [],
         restrictions: [],
         dependencies: [],
-      } as EmployeePostBody,
+      } as Employee,
 
-      showAddModal: false,
-      showUpdateModal: false,
+      shoWModal: false,
     };
   },
   computed: {
@@ -48,9 +46,7 @@ export default {
     toggleDetails(employee: ShowDetail) {
       employee.showDetails = !employee.showDetails;
     },
-    handleAddModal() {
-      this.showAddModal = !this.showAddModal;
-    },
+
     initializeState() {
       this.targetEmployee = {
         last_name: "",
@@ -60,27 +56,45 @@ export default {
         dependencies: [],
       };
     },
-    setTargetEmployee(employee: Employee) {
-      // 更新するターゲットをtargetEmployeeにセットする
-      if (!this.showUpdateModal) {
-        this.targetEmployee = JSON.parse(JSON.stringify(employee)); //employeeにはidがあるがこれでいいのか
-        console.log(employee.id);
+
+    // 未実装
+    async saveEmployee(employee: Employee) {
+      if (!employee.id) {
+        this.addEmployee(employee);
+        console.log("こいつを追加処理");
+        console.log(employee);
       } else {
-        console.log("EmployeesのtargetEmployeeの初期化");
-        this.initializeState();
+        // 更新APIを呼び出し
+        this.updateEmployee(employee);
       }
     },
-    async handleUpdateModal(employee: Employee) {
-      console.log(employee);
-      this.setTargetEmployee(employee);
-      this.showUpdateModal = !this.showUpdateModal;
-    },
+
     removeEmployee(employeeId: number) {
       this.deleteEmployee(employeeId);
     },
-  },
-  upDateEmployees() {
-    // ここで条件分岐して
+
+    setTargetEmployee(employee: Employee) {
+      this.targetEmployee = JSON.parse(JSON.stringify(employee)); //employeeにはidがあるがこれでいいのか
+    },
+    setShowModal() {
+      if (this.shoWModal) {
+        console.log("EmployeesのtargetEmployeeの初期化");
+        this.initializeState();
+      }
+      this.shoWModal = !this.shoWModal;
+    },
+
+    updateEmployee(updatedEmployee: Employee) {
+      const changes = {} as ChaseChange;
+      Object.keys(updatedEmployee).forEach((key) => {
+        if (this.targetEmployee[key] !== updatedEmployee[key]) {
+          changes[key] = updatedEmployee[key];
+        }
+      });
+      console.log(changes);
+      console.log(updatedEmployee);
+      console.log(this.targetEmployee);
+    },
   },
 };
 </script>
@@ -92,33 +106,23 @@ export default {
         <EmployeeItem
           :employee="employee"
           :deleteEmployee="deleteEmployee"
-          :handleUpdateModal="handleUpdateModal"
+          :setShowModal="setShowModal"
+          :setTargetEmployee="setTargetEmployee"
         />
       </li>
     </ul>
     <button
       class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2"
-      @click="handleAddModal"
+      @click="setShowModal"
     >
       従業員を追加
     </button>
 
     <EmployeeModal
-      v-show="showAddModal"
-      @closeModal="handleAddModal"
+      v-show="shoWModal"
+      :closeModal="setShowModal"
       :employee="targetEmployee"
-      title="新規従業員登録"
-      buttonTitle="追加"
-      :handleEmployee="addEmployee"
-    />
-
-    <EmployeeModal
-      v-show="showUpdateModal"
-      @closeModal="handleUpdateModal"
-      :employee="targetEmployee"
-      title="従業員情報の更新"
-      buttonTitle="更新"
-      :handleEmployee="addEmployee"
+      :saveEmployee="saveEmployee"
     />
   </div>
 </template>

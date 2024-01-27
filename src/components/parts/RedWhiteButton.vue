@@ -17,7 +17,6 @@ export default {
   },
   methods: {
     clickButton() {
-      console.log(this.index);
       if (this.removeItem) {
         this.removeItem(this.index);
       } else if (this.addInput) {

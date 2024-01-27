@@ -9,7 +9,7 @@
   />
 </template>
 <script lang="ts">
-import type { Qualification } from "../../types";
+import type { EmployeeQualification } from "../../types";
 export default {
   props: {
     id: String,
@@ -18,7 +18,7 @@ export default {
       required: true,
     },
     qualified: {
-      type: Array as () => Qualification[],
+      type: Array as () => EmployeeQualification[],
       required: true,
     },
     updateQualifications: {
@@ -29,15 +29,18 @@ export default {
   computed: {
     isChecked() {
       const index = this.qualified.findIndex(
-        (q) => q.id === this.qualification.id
+        (q) => q.qualification_id === this.qualification.id
       );
       return index > -1;
     },
   },
   methods: {
     handleChange() {
-      console.log(this.qualified);
-      this.updateQualifications(this.qualification);
+      const newQualification = {
+        qualification_id: this.qualification.id,
+        name: this.qualification.name,
+      };
+      this.updateQualifications(newQualification);
     },
   },
 };
