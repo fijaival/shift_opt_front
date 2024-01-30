@@ -2,7 +2,6 @@
 import { mapActions, mapGetters } from "vuex";
 import type {
   Employee,
-  Restriction,
   EmployeeQualification,
   EmployeeRestriction,
   Dependencies,
@@ -71,28 +70,30 @@ export default {
           JSON.stringify(this.targetEmployee) ===
           JSON.stringify(this.originalEmployee)
         ) {
+          this.message = "";
           return false;
         }
       }
       const isNameValid =
         this.targetEmployee.first_name.trim() !== "" &&
         this.targetEmployee.last_name.trim() !== "";
+
       const areRestrictionsValid = this.targetEmployee.restrictions.every(
         (ri: EmployeeRestriction) => {
-          const isSelected = ri.restricton_id !== null;
+          const isSelected = ri.restriction_id !== null;
           const isValueValid = typeof ri.value === "number" && ri.value! >= 1;
           return isSelected ? isValueValid : true;
         }
       );
       const uniqueRestrictionIds = new Set(
         this.targetEmployee.restrictions
-          .map((ri: EmployeeRestriction) => ri.restricton_id)
-          .filter((restricton_id: number) => restricton_id !== null)
+          .map((ri: EmployeeRestriction) => ri.restriction_id)
+          .filter((restriction_id: number) => restriction_id !== null)
       );
       const areRestrictionIdsUnique =
         uniqueRestrictionIds.size ===
         this.targetEmployee.restrictions.filter(
-          (ri: EmployeeRestriction) => ri.restricton_id !== null
+          (ri: EmployeeRestriction) => ri.restriction_id !== null
         ).length;
 
       const uniqueDependency = new Set(
@@ -178,12 +179,13 @@ export default {
     },
     addRestrictionInput() {
       this.targetEmployee.restrictions.push({
-        restricton_id: -1,
+        restriction_id: -1,
         name: "",
         value: 0,
       });
     },
     addDependency() {
+      console.log(this.targetEmployee);
       this.targetEmployee.dependencies.push({
         required_employee_id: -1,
         first_name: "",
@@ -198,7 +200,7 @@ export default {
     },
     updateRestrictionName(index: number, selectedId: number) {
       const selectedRestriction = this.getRestrictions.find(
-        (restriction: Restriction) => restriction.id === selectedId
+        (restriction: EmployeeRestriction) => restriction.id === selectedId
       );
       if (selectedRestriction) {
         this.targetEmployee.restrictions[index].name = selectedRestriction.name;
@@ -215,8 +217,23 @@ export default {
           selectedCaregiver.last_name;
       }
     },
+    filterItem() {
+      if (this.targetEmployee.restrictions) {
+        this.targetEmployee.restrictions =
+          this.targetEmployee.restrictions.filter(
+            (res: EmployeeRestriction) => res.restriction_id != -1
+          );
+      }
+      if (this.targetEmployee.dependencies) {
+        this.targetEmployee.dependencies =
+          this.targetEmployee.dependencies.filter(
+            (dep: Dependencies) => dep.required_employee_id != -1
+          );
+      }
+    },
 
     async registerNewEmployee() {
+      this.filterItem();
       this.saveEmployee(this.targetEmployee);
       this.closeModal();
     },
@@ -291,9 +308,13 @@ export default {
                   <div class="relative h-10 w-72 min-w-[200px]">
                     <select
                       id="underline_select"
-                      v-model="existingRest.restricton_id"
+                      v-model="existingRest.restriction_id"
+                      :disabled="existingRest.id"
                       @change="
-                        updateRestrictionName(index, existingRest.restricton_id)
+                        updateRestrictionName(
+                          index,
+                          existingRest.restriction_id
+                        )
                       "
                       class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                     >
@@ -355,6 +376,7 @@ export default {
                     <select
                       id="underline_select"
                       v-model="dep.required_employee_id"
+                      :disabled="dep.id"
                       @change="
                         updateCaregiverName(index, dep.required_employee_id)
                       "

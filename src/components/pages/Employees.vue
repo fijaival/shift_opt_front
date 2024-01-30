@@ -1,9 +1,11 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
-import { Employee, ChaseChange } from "../../types";
+import { Employee } from "../../types";
 
 import EmployeeModal from "../globals/EmployeeModal.vue";
 import EmployeeItem from "../parts/EmployeeItem.vue";
+
+import organizeData from "../../lib/organizeData";
 
 interface ShowDetail {
   id: number;
@@ -42,6 +44,7 @@ export default {
       fetchEmployes: "employee/fetchEmployees",
       deleteEmployee: "employee/deleteEmployee",
       addEmployee: "employee/addEmployee",
+      updateEmployee: "updateEmployee/updateEmployee",
     }),
     toggleDetails(employee: ShowDetail) {
       employee.showDetails = !employee.showDetails;
@@ -60,12 +63,23 @@ export default {
     // 未実装
     async saveEmployee(employee: Employee) {
       if (!employee.id) {
-        this.addEmployee(employee);
-        console.log("こいつを追加処理");
-        console.log(employee);
+        try {
+          await this.addEmployee(employee);
+
+          this.fetchEmployes();
+        } catch (error) {
+          console.error("Employee fetchエラー", error);
+        }
       } else {
         // 更新APIを呼び出し
-        this.updateEmployee(employee);
+        const change = organizeData(employee, this.targetEmployee);
+        console.log(change);
+        // const body = change.restrictions.post[0];
+        // console.log(body);
+        await this.updateEmployee(change);
+
+        // もしすべての処理が上手くいけば
+        this.fetchEmployes();
       }
     },
 
@@ -82,18 +96,6 @@ export default {
         this.initializeState();
       }
       this.shoWModal = !this.shoWModal;
-    },
-
-    updateEmployee(updatedEmployee: Employee) {
-      const changes = {} as ChaseChange;
-      Object.keys(updatedEmployee).forEach((key) => {
-        if (this.targetEmployee[key] !== updatedEmployee[key]) {
-          changes[key] = updatedEmployee[key];
-        }
-      });
-      console.log(changes);
-      console.log(updatedEmployee);
-      console.log(this.targetEmployee);
     },
   },
 };

@@ -54,18 +54,13 @@ const actions: ActionTree<EmployeeState, RootState> = {
       const headers = {
         "X-CSRF-TOKEN": csrfToken,
       };
+      console.log(newEmployee);
       const response = await client.v1.employees.post({
         body: newEmployee,
         config: { headers },
       });
       if (response.status === 201) {
         // stateのEmployeeとpostするときに
-        const newEmployeeResponse: PostResponse = response.body;
-        const addedEmployee: Employee = {
-          id: newEmployeeResponse.id,
-          ...newEmployee,
-        };
-        commit("addEmployee", addedEmployee);
       } else {
         throw new Error("Failed to add new employee");
       }

@@ -34,7 +34,7 @@ export interface Restriction {
 export interface EmployeeRestriction {
   id?: number;
   name: string;
-  restricton_id: number;
+  restriction_id: number;
   value: number;
 }
 
