@@ -14,6 +14,7 @@ interface RestrictionState {
 }
 
 const actions: ActionTree<RestrictionState, RootState> = {
+  // ここの繰り返し呼び出しは必ず修正
   async updateEmployee({ commit }, change: UpdateEmployee) {
     try {
       const csrfToken = localStorage.getItem("CsrfAccessToken");

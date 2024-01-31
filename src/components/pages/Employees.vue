@@ -60,7 +60,6 @@ export default {
       };
     },
 
-    // 未実装
     async saveEmployee(employee: Employee) {
       if (!employee.id) {
         try {
@@ -77,12 +76,12 @@ export default {
           this.targetEmployee
         );
         console.log(change);
-        // const body = change.restrictions.post[0];
-        // console.log(body);
-        await this.updateEmployee(change);
-
-        // もしすべての処理が上手くいけば
-        this.fetchEmployes();
+        try {
+          await this.updateEmployee(change);
+          this.fetchEmployes();
+        } catch (error) {
+          console.error(error + "従業員の更新に失敗しました。");
+        }
       }
     },
 
@@ -90,7 +89,7 @@ export default {
       this.deleteEmployee(employeeId);
     },
 
-    setTargetEmployee(employee: Employee) {
+    setTargetEmployee(employee: EmployeeWithId) {
       this.targetEmployee = JSON.parse(JSON.stringify(employee)); //employeeにはidがあるがこれでいいのか
     },
     setShowModal() {
