@@ -1,6 +1,6 @@
 <script lang="ts">
 import { mapActions, mapGetters } from "vuex";
-import { Employee } from "../../types";
+import { Employee, EmployeeWithId } from "../../types";
 
 import EmployeeModal from "../globals/EmployeeModal.vue";
 import EmployeeItem from "../parts/EmployeeItem.vue";
@@ -72,7 +72,10 @@ export default {
         }
       } else {
         // 更新APIを呼び出し
-        const change = organizeData(employee, this.targetEmployee);
+        const change = organizeData(
+          employee as EmployeeWithId,
+          this.targetEmployee
+        );
         console.log(change);
         // const body = change.restrictions.post[0];
         // console.log(body);

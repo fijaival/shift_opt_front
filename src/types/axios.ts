@@ -13,6 +13,10 @@ export interface DriverPostBody {
   first_name: string;
   last_name: string;
 }
+export interface EmployeeNamePostBody {
+  first_name: string;
+  last_name: string;
+}
 
 export interface QualificationsPostBody {
   neme: string;
@@ -38,6 +42,7 @@ export interface PostEmployeeDependencies {
 }
 
 export interface UpdateName {
+  id: number;
   first_name: string;
   last_name: string;
 }
@@ -57,6 +62,11 @@ export interface PostEmployeeRestrictions {
 export interface PutEmployeeRestrictions {
   value: number;
 }
+
+export interface ChangeEmployeeRestrictions {
+  id: number;
+  value: number;
+}
 export interface UpdateEmployee {
   dependencies: {
     post: PostEmployeeDependencies[];
@@ -67,14 +77,9 @@ export interface UpdateEmployee {
   restrictions: {
     post: PostEmployeeRestrictions[];
     delete: number[];
-    put: PutEmployeeRestrictions[];
+    put: ChangeEmployeeRestrictions[];
   };
   [key: string]: any;
 }
 
 export type Value = EmployeeQualification | EmployeeRestriction | Dependencies;
-
-export type Update =
-  | PostEmployeeDependencies[]
-  | PostEmployeeQualifications[]
-  | PostEmployeeRestrictions[];

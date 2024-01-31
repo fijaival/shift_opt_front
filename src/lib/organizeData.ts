@@ -1,15 +1,10 @@
 import * as lodash from "lodash";
 
 import { UpdateEmployee, Value } from "../types/axios";
-import {
-  Employee,
-  EmployeeQualification,
-  EmployeeRestriction,
-  Dependencies,
-} from "../types";
+import { Employee, EmployeeWithId, EmployeeRestriction } from "../types";
 
 function organizeData(
-  updatedEmployee: Employee,
+  updatedEmployee: EmployeeWithId,
   targetEmployee: Employee
 ): UpdateEmployee {
   const update = {
@@ -25,6 +20,7 @@ function organizeData(
         if (nameUpdate == 0) {
           const newName = [
             {
+              id: updatedEmployee["id"],
               first_name: updatedEmployee["first_name"],
               last_name: updatedEmployee["last_name"],
             },

@@ -1,5 +1,3 @@
-import { EmployeePostBody } from "./axios";
-
 export interface Driver {
   id: number;
   first_name: string;
@@ -32,7 +30,7 @@ export interface Restriction {
 }
 
 export interface EmployeeRestriction {
-  id?: number;
+  id: number;
   name: string;
   restriction_id: number;
   value: number;
@@ -52,6 +50,10 @@ export interface Employee {
   qualifications: EmployeeQualification[];
   restrictions: EmployeeRestriction[];
   [key: string]: any;
+}
+
+export interface EmployeeWithId extends Employee {
+  id: number;
 }
 
 export type EmployeesType = Employee[];

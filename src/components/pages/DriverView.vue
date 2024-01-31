@@ -1,5 +1,6 @@
 <script lang="ts">
-import { Driver, DriverName } from "../../types";
+import { Driver } from "../../types";
+import { DriverPostBody } from "../../types/axios";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -7,7 +8,7 @@ export default {
   data() {
     return {
       drivers: [] as Driver[],
-      newDriver: { first_name: "", last_name: "" } as DriverName,
+      newDriver: { first_name: "", last_name: "" } as DriverPostBody,
       isValidNewDriver: false,
     };
   },
