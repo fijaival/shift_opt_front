@@ -1,15 +1,23 @@
 <script lang="ts">
 import { Driver } from "../../types";
-import { DriverPostBody } from "../../types/axios";
 import { mapActions, mapGetters } from "vuex";
+import DriverItem from "../parts/DriverItem.vue";
+
+import DriverModal from "../globals/DriverModal.vue";
 
 export default {
   name: "DriverView",
+  components: {
+    DriverModal,
+    DriverItem,
+  },
   data() {
     return {
-      drivers: [] as Driver[],
-      newDriver: { first_name: "", last_name: "" } as DriverPostBody,
-      isValidNewDriver: false,
+      targetDriver: {
+        last_name: "",
+        first_name: "",
+      } as Driver,
+      shoWModal: false,
     };
   },
   computed: {
@@ -25,60 +33,65 @@ export default {
       fetchDrivers: "driver/fetchDrivers",
       addDriver: "driver/addDriver",
       deleteDriver: "driver/deleteDriver",
+      updateDriver: "driver/updateDriver",
     }),
+    initializeState() {
+      this.targetDriver = {
+        last_name: "",
+        first_name: "",
+      };
+    },
 
-    validateInput() {
-      if (
-        typeof this.newDriver.first_name !== "string" ||
-        typeof this.newDriver.last_name !== "string"
-      ) {
-        console.error("Error: Invalid input type");
-        return;
+    setTargetDriver(driver: Driver) {
+      this.targetDriver = JSON.parse(JSON.stringify(driver)); //employeeにはidがあるがこれでいいのか
+    },
+    setShowModal() {
+      if (this.shoWModal) {
+        console.log("EmployeesのtargetEmployeeの初期化");
+        this.initializeState();
       }
-
-      this.isValidNewDriver =
-        this.newDriver.first_name.trim() !== "" &&
-        this.newDriver.last_name.trim() !== "";
+      this.shoWModal = !this.shoWModal;
+    },
+    async saveDriver(newDriver: Driver) {
+      if (!newDriver.id) {
+        this.addDriver(newDriver);
+      } else {
+        try {
+          await this.updateDriver(newDriver);
+          this.fetchDrivers();
+        } catch (error) {
+          console.error(error + "従業員の更新に失敗しました");
+        }
+      }
     },
   },
 };
 </script>
 
 <template>
-  <p class="bg-blue-200 text-2xl p-4">ドライバー情報</p>
-  <div class="container mx-auto mt-4">
-    <button class="btn btn-primary" @click="fetchDrivers">結果を出力</button>
-
-    <!-- 新しいドライバーの追加フォーム -->
-    <div>
-      <input
-        v-model="newDriver.last_name"
-        placeholder="姓"
-        @input="validateInput"
-      />
-      <input
-        v-model="newDriver.first_name"
-        placeholder="名"
-        @input="validateInput"
-      />
-
-      <button
-        class="btn btn-secondary"
-        @click="addDriver(newDriver)"
-        :disabled="!isValidNewDriver"
-      >
-        追加
-      </button>
-    </div>
-  </div>
-
   <!-- 結果の表示例 -->
   <div>
     <ul>
       <li v-for="driver in getDrivers" :key="driver.id">
-        {{ driver.last_name }} {{ driver.first_name }}
-        <button @click="deleteDriver(driver.id)">削除</button>
+        <DriverItem
+          :driver="driver"
+          :deleteDriver="deleteDriver"
+          :setShowModal="setShowModal"
+          :setTargetDriver="setTargetDriver"
+        />
       </li>
     </ul>
+    <button
+      class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2"
+      @click="setShowModal"
+    >
+      ドライバーを追加
+    </button>
+    <DriverModal
+      v-show="shoWModal"
+      :closeModal="setShowModal"
+      :driver="targetDriver"
+      :saveDriver="saveDriver"
+    />
   </div>
 </template>

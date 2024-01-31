@@ -145,8 +145,6 @@ export default {
       addEmployee: "employee/addEmployee",
     }),
     clickEvent() {
-      console.log("employeeModalでの初期化");
-      // this.initializeProp();
       this.closeModal();
     },
     stopEvent(event: Event) {

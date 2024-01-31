@@ -68,6 +68,10 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
               fetch<Methods_vub5f7['delete']['resBody']>(prefix, prefix2, DELETE, option).json(),
             $delete: (option?: { config?: T | undefined } | undefined) =>
               fetch<Methods_vub5f7['delete']['resBody']>(prefix, prefix2, DELETE, option).json().then(r => r.body),
+            put: (option: { body: Methods_vub5f7['put']['reqBody'], config?: T | undefined }) =>
+              fetch(prefix, prefix2, PUT, option).send(),
+            $put: (option: { body: Methods_vub5f7['put']['reqBody'], config?: T | undefined }) =>
+              fetch(prefix, prefix2, PUT, option).send().then(r => r.body),
             $path: () => `${prefix}${prefix2}`,
           };
         },

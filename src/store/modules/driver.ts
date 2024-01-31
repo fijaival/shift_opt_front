@@ -45,7 +45,6 @@ const actions: ActionTree<DriverState, RootState> = {
   async addDriver({ commit }, newDriver: DriverPostBody) {
     try {
       const csrfToken = localStorage.getItem("CsrfAccessToken");
-      console.log(csrfToken);
       const client = api(aspida(AxiosInstance));
       const headers = {
         "X-CSRF-TOKEN": csrfToken,
@@ -86,6 +85,27 @@ const actions: ActionTree<DriverState, RootState> = {
       }
     } catch (error) {
       console.error("Error deleting driver: ", error);
+    }
+  },
+  async updateDriver({ commit }, newDriver) {
+    try {
+      const csrfToken = localStorage.getItem("CsrfAccessToken");
+      const client = api(aspida(AxiosInstance));
+      const headers = {
+        "X-CSRF-TOKEN": csrfToken,
+      };
+      const { first_name, last_name } = newDriver;
+      const newName = { first_name, last_name };
+      const response = await client.v1.drivers._driverId(newDriver.id).put({
+        body: newName,
+        config: { headers },
+      });
+      if (response.status !== 200) {
+        throw new Error("Failed to update No." + newDriver.id + "driver");
+      }
+    } catch (error) {
+      console.log(error);
+      console.error("Error updating Employee: ", error);
     }
   },
 };

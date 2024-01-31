@@ -1,3 +1,4 @@
+import { DriverPostBody } from "../../../src/types/axios";
 import type { DefineMethods } from "aspida";
 
 type responseBody = {
@@ -7,5 +8,8 @@ type responseBody = {
 export type Methods = DefineMethods<{
   delete: {
     resBody: responseBody;
+  };
+  put: {
+    reqBody: DriverPostBody;
   };
 }>;

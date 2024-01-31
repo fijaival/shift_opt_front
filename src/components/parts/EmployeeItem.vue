@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Employee } from "../..//types";
+import { Employee } from "../../types";
 export default {
   data() {
     return {
