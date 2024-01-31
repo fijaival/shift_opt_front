@@ -3,7 +3,7 @@ import aspida from "@aspida/axios";
 import api from "../../../api/$api";
 import AxiosInstance from "../../lib/axios";
 
-import { PostResponse, Employee, EmployeesType } from "../../types";
+import { Employee, EmployeesType } from "../../types";
 import { EmployeePostBody } from "../../types/axios";
 
 type RootState = {
