@@ -104,24 +104,33 @@ export default {
 </script>
 
 <template>
-  <div>
-    <ul>
-      <li v-for="employee in getEmployees" :key="employee.id">
+  <div class="container mx-auto px-4">
+    <div
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-fr"
+    >
+      <div
+        class="max-w-sm cursor-pointer overflow-hidden rounded shadow-lg hover:bg-gray-100"
+        v-for="employee in getEmployees"
+        :key="employee.id"
+      >
         <EmployeeItem
           :employee="employee"
           :deleteEmployee="deleteEmployee"
           :setShowModal="setShowModal"
           :setTargetEmployee="setTargetEmployee"
         />
-      </li>
-    </ul>
-    <button
-      class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2"
-      @click="setShowModal"
-    >
-      従業員を追加
-    </button>
-
+      </div>
+      <div
+        class="max-w-sm cursor-pointer overflow-hidden rounded shadow-lg hover:bg-gray-100"
+      >
+        <div
+          class="flex h-ful min-h-48 items-center justify-center"
+          @click="setShowModal"
+        >
+          <div class="text-xl font-bold">＋追加</div>
+        </div>
+      </div>
+    </div>
     <EmployeeModal
       v-show="shoWModal"
       :closeModal="setShowModal"

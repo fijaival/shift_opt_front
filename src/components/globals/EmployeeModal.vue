@@ -455,8 +455,18 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 2;
-  width: 60%;
+  width: 60%; /* 大きめの画面での幅 */
+  max-height: 80vh; /* 大きめの画面での最大高さ */
+  overflow-y: auto; /* 内容が縦にはみ出る場合にスクロールバーを表示 */
+  max-width: 100%;
   padding: 1em;
   background: #fff;
+  max-height: 80vh; /* 画面の縦幅の80% */
+}
+
+#content > div {
+  margin-top: 0;
+  margin-bottom: 0;
+  max-height: 75vh;
 }
 </style>

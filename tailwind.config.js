@@ -14,6 +14,9 @@ export default {
           50: "#fca",
         },
       },
+      gridAutoRows: {
+        fr: "minmax(0, 1fr)",
+      },
     },
   },
   plugins: [daisyUI],

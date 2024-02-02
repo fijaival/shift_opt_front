@@ -29,9 +29,10 @@ async function refreshTokenAndRetryRequest(error: AxiosError) {
       console.log("Token refreshed successfully");
       const newToken = refreshResponse.headers["x-csrf-token"];
       error.config.headers["X-CSRF-TOKEN"] = newToken;
+      localStorage.setItem("CsrfAccessToken", newToken);
+
       error.config.headers[NO_RETRY_HEADER] = "true";
-      console.log(axiosInstance.request(error.config));
-      return axiosInstance.request(error.config);
+      return await axiosInstance.request(error.config);
     }
   } catch (refreshError) {
     // トークンリフレッシュのエラー処理
@@ -42,7 +43,10 @@ async function refreshTokenAndRetryRequest(error: AxiosError) {
 }
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("成功したぜ");
+    return response;
+  },
   async (error) => {
     // ここでx-no-retryヘッダーを確認
     if (error.config?.headers[NO_RETRY_HEADER]) {

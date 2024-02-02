@@ -1,8 +1,5 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import aspida from "@aspida/axios";
-import api from "../../../api/$api";
-import AxiosInstance from "../../lib/axios";
-
+import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 import { PostResponse, Qualification } from "../../types";
 
 type RootState = {
@@ -31,7 +28,7 @@ const mutations: MutationTree<QualificationState> = {
 const actions: ActionTree<QualificationState, RootState> = {
   async fetchQualifications({ commit }) {
     try {
-      const client = api(aspida(AxiosInstance));
+      const client = createApiClient();
       const response = await client.v1.qualifications.get();
 
       if (response.status === 200 && response.body) {
@@ -45,12 +42,9 @@ const actions: ActionTree<QualificationState, RootState> = {
   },
   async addQualification({ commit }, newQualification) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      console.log(csrfToken);
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
+
       const response = await client.v1.qualifications.post({
         body: newQualification,
         config: { headers },
@@ -72,11 +66,8 @@ const actions: ActionTree<QualificationState, RootState> = {
   },
   async deleteQualification({ commit }, qualificationId: number) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const response = await client.v1.qualifications
         ._qualificationId(qualificationId)
         .delete({

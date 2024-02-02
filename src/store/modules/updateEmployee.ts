@@ -1,7 +1,6 @@
 import { ActionTree, Module } from "vuex";
-import aspida from "@aspida/axios";
-import api from "../../../api/$api";
-import AxiosInstance from "../../lib/axios";
+
+import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 
 import { UpdateEmployee } from "../../types/axios";
 
@@ -17,13 +16,9 @@ const actions: ActionTree<RestrictionState, RootState> = {
   // ここの繰り返し呼び出しは必ず修正
   async updateEmployee({ commit }, change: UpdateEmployee) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      console.log(change);
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
       for (const restriction of change.restrictions.post) {
+        const headers = getAuthHeaders();
         const response = await client.v1.employees_restrictions.post({
           body: restriction,
           config: { headers },
@@ -34,6 +29,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
       }
 
       for (const qualification of change.qualifications.post) {
+        const headers = getAuthHeaders();
         const response = await client.v1.employees_qualifications.post({
           body: qualification,
           config: { headers },
@@ -44,15 +40,17 @@ const actions: ActionTree<RestrictionState, RootState> = {
       }
 
       for (const dependency of change.dependencies.post) {
+        const headers = getAuthHeaders();
         const response = await client.v1.dependencies.post({
           body: dependency,
           config: { headers },
         });
         if (response.status !== 201) {
-          throw new Error("Failed to add new Dependency");
+          throw new Error("リクエストが成功しませんでした。"); // エラーメッセージは状況に応じて適切に設定してください。
         }
       }
       for (const restrictionId of change.restrictions.delete) {
+        const headers = getAuthHeaders();
         const response = await client.v1.employees_restrictions
           ._erId(restrictionId)
           .delete({
@@ -65,6 +63,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
         }
       }
       for (const qualificationId of change.qualifications.delete) {
+        const headers = getAuthHeaders();
         const response = await client.v1.employees_qualifications
           ._eqId(qualificationId)
           .delete({
@@ -78,6 +77,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
       }
 
       for (const dependencyId of change.dependencies.delete) {
+        const headers = getAuthHeaders();
         const response = await client.v1.dependencies
           ._depId(dependencyId)
           .delete({
@@ -90,6 +90,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
         }
       }
       for (const restriction of change.restrictions.put) {
+        const headers = getAuthHeaders();
         const { value } = restriction;
         const newValue = { value };
         const response = await client.v1.employees_restrictions
@@ -105,6 +106,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
         }
       }
       for (const name of change.name.put) {
+        const headers = getAuthHeaders();
         const { first_name, last_name } = name;
         const newName = { first_name, last_name };
         const response = await client.v1.employees._employeeId(name.id).put({

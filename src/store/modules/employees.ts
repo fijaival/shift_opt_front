@@ -1,7 +1,5 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import aspida from "@aspida/axios";
-import api from "../../../api/$api";
-import AxiosInstance from "../../lib/axios";
+import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 
 import { Employee, EmployeesType } from "../../types";
 import { EmployeePostBody } from "../../types/axios";
@@ -33,7 +31,7 @@ const mutations: MutationTree<EmployeeState> = {
 const actions: ActionTree<EmployeeState, RootState> = {
   async fetchEmployees({ commit }) {
     try {
-      const client = api(aspida(AxiosInstance));
+      const client = createApiClient();
       const response = await client.v1.employees.get();
 
       if (response.status === 200 && response.body) {
@@ -48,16 +46,12 @@ const actions: ActionTree<EmployeeState, RootState> = {
 
   async addEmployee({ commit }, newEmployee: EmployeePostBody) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      console.log(csrfToken);
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       console.log(newEmployee);
       const response = await client.v1.employees.post({
         body: newEmployee,
-        config: { headers },
+        config: { headers: headers },
       });
       if (response.status === 201) {
         // stateのEmployeeとpostするときに
@@ -71,11 +65,8 @@ const actions: ActionTree<EmployeeState, RootState> = {
   },
   async deleteEmployee({ commit }, employeeId: number) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const response = await client.v1.employees
         ._employeeId(employeeId)
         .delete({

@@ -1,7 +1,5 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import aspida from "@aspida/axios";
-import api from "../../../api/$api";
-import AxiosInstance from "../../lib/axios";
+import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 
 import { PostResponse, Restriction } from "../../types";
 
@@ -30,7 +28,7 @@ const mutations: MutationTree<RestrictionState> = {
 const actions: ActionTree<RestrictionState, RootState> = {
   async fetcRrestrictions({ commit }) {
     try {
-      const client = api(aspida(AxiosInstance));
+      const client = createApiClient();
       const response = await client.v1.restrictions.get();
 
       if (response.status === 200 && response.body) {
@@ -44,12 +42,8 @@ const actions: ActionTree<RestrictionState, RootState> = {
   },
   async addRestriction({ commit }, newRestriction) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      console.log(csrfToken);
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const response = await client.v1.restrictions.post({
         body: newRestriction,
         config: { headers },
@@ -71,11 +65,8 @@ const actions: ActionTree<RestrictionState, RootState> = {
   },
   async deleteRestriction({ commit }, RestrictionId: number) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const response = await client.v1.restrictions
         ._restrictionId(RestrictionId)
         .delete({

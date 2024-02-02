@@ -1,7 +1,6 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import aspida from "@aspida/axios";
-import api from "../../../api/$api";
-import AxiosInstance from "../../lib/axios";
+
+import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 
 import { Driver, DriversType, PostResponse } from "../../types";
 import { DriverPostBody } from "@/types/axios";
@@ -30,7 +29,7 @@ const mutations: MutationTree<DriverState> = {
 const actions: ActionTree<DriverState, RootState> = {
   async fetchDrivers({ commit }) {
     try {
-      const client = api(aspida(AxiosInstance));
+      const client = createApiClient();
       const response = await client.v1.drivers.get();
 
       if (response.status === 200 && response.body) {
@@ -44,11 +43,8 @@ const actions: ActionTree<DriverState, RootState> = {
   },
   async addDriver({ commit }, newDriver: DriverPostBody) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const response = await client.v1.drivers.post({
         body: newDriver,
         config: { headers },
@@ -70,11 +66,8 @@ const actions: ActionTree<DriverState, RootState> = {
   },
   async deleteDriver({ commit }, driverId: number) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const response = await client.v1.drivers._driverId(driverId).delete({
         config: { headers },
       });
@@ -89,11 +82,8 @@ const actions: ActionTree<DriverState, RootState> = {
   },
   async updateDriver({ commit }, newDriver) {
     try {
-      const csrfToken = localStorage.getItem("CsrfAccessToken");
-      const client = api(aspida(AxiosInstance));
-      const headers = {
-        "X-CSRF-TOKEN": csrfToken,
-      };
+      const client = createApiClient();
+      const headers = getAuthHeaders();
       const { first_name, last_name } = newDriver;
       const newName = { first_name, last_name };
       const response = await client.v1.drivers._driverId(newDriver.id).put({
