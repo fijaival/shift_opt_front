@@ -43,9 +43,10 @@ export default {
     },
 
     setTargetDriver(driver: Driver) {
-      this.targetDriver = JSON.parse(JSON.stringify(driver)); //employeeにはidがあるがこれでいいのか
+      this.targetDriver = JSON.parse(JSON.stringify(driver)); //driverにはidがあるがこれでいいのか
     },
     setShowModal() {
+      console.log(this.getDrivers);
       if (this.shoWModal) {
         console.log("EmployeesのtargetEmployeeの初期化");
         this.initializeState();
@@ -70,23 +71,25 @@ export default {
 
 <template>
   <!-- 結果の表示例 -->
-  <div>
-    <ul>
-      <li v-for="driver in getDrivers" :key="driver.id">
-        <DriverItem
-          :driver="driver"
-          :deleteDriver="deleteDriver"
-          :setShowModal="setShowModal"
-          :setTargetDriver="setTargetDriver"
-        />
-      </li>
-    </ul>
-    <button
-      class="bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2"
+  <div class="flex flex-wrap -m-2 max-w-4xl mx-auto">
+    <div class="p-2 w-full" v-for="driver in getDrivers" :key="driver.id">
+      <DriverItem
+        :driver="driver"
+        :deleteDriver="deleteDriver"
+        :setShowModal="setShowModal"
+        :setTargetDriver="setTargetDriver"
+      />
+    </div>
+    <div
+      class="p-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5"
       @click="setShowModal"
     >
-      ドライバーを追加
-    </button>
+      <div
+        class="max-w-sm cursor-pointer overflow-hidden rounded shadow-lg hover:bg-gray-100 bg-white rounded-lg shadow-lg p-5"
+      >
+        <div class="text-xl font-bold">＋追加</div>
+      </div>
+    </div>
     <DriverModal
       v-show="shoWModal"
       :closeModal="setShowModal"
