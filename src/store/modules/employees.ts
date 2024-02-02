@@ -44,7 +44,7 @@ const actions: ActionTree<EmployeeState, RootState> = {
     }
   },
 
-  async addEmployee({ commit }, newEmployee: EmployeePostBody) {
+  async addEmployee(_, newEmployee: EmployeePostBody) {
     try {
       const client = createApiClient();
       const headers = getAuthHeaders();

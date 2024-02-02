@@ -14,7 +14,7 @@ interface RestrictionState {
 
 const actions: ActionTree<RestrictionState, RootState> = {
   // ここの繰り返し呼び出しは必ず修正
-  async updateEmployee({ commit }, change: UpdateEmployee) {
+  async updateEmployee(_, change: UpdateEmployee) {
     try {
       const client = createApiClient();
       for (const restriction of change.restrictions.post) {

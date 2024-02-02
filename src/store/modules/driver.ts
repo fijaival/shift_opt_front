@@ -80,7 +80,7 @@ const actions: ActionTree<DriverState, RootState> = {
       console.error("Error deleting driver: ", error);
     }
   },
-  async updateDriver({ commit }, newDriver) {
+  async updateDriver(_, newDriver) {
     try {
       const client = createApiClient();
       const headers = getAuthHeaders();
