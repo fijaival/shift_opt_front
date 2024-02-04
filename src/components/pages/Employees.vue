@@ -5,7 +5,7 @@ import { Employee, EmployeeWithId } from "../../types";
 import EmployeeModal from "../parts/employee/EmployeeModal.vue";
 import EmployeeItem from "../parts/employee/EmployeeItem.vue";
 
-import organizeData from "../../lib/organizeData";
+import organizeData from "../../utils/organizeData";
 
 interface ShowDetail {
   id: number;
