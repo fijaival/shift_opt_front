@@ -4,6 +4,7 @@ import HomeView from "../components/pages/HomeView.vue";
 import DriverView from "../components/pages/DriverView.vue";
 import EmployeeView from "../components/pages/Employees.vue";
 import Login from "../components/pages/Login.vue";
+import ShiftRequests from "../components/pages/ShiftRequests.vue";
 import store from "../store/index.ts";
 
 const router = createRouter({
@@ -37,6 +38,14 @@ const router = createRouter({
       name: "Employee",
       path: "/employee",
       component: EmployeeView,
+      meta: {
+        requiresAuth: true, // 認証済の時のみ閲覧可能となるように定義
+      },
+    },
+    {
+      name: "Request",
+      path: "/request",
+      component: ShiftRequests,
       meta: {
         requiresAuth: true, // 認証済の時のみ閲覧可能となるように定義
       },

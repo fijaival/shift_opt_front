@@ -6,6 +6,7 @@ import { EmployeeModule } from "./modules/employees";
 import { QualificationModule } from "./modules/qualification";
 import { RestrictionModule } from "./modules/restriction";
 import { updateEmployeeModule } from "./modules/updateEmployee";
+import { RequestModule } from "./modules/request";
 
 type RootState = {
   version: string;
@@ -22,6 +23,7 @@ export default createStore<RootState>({
     qualification: QualificationModule,
     restriction: RestrictionModule,
     updateEmployee: updateEmployeeModule,
+    request: RequestModule,
   },
 });
 

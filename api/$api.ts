@@ -14,6 +14,9 @@ import type { Methods as Methods_1im4lra } from './v1/qualifications';
 import type { Methods as Methods_1jp0ihd } from './v1/qualifications/_qualificationId@number';
 import type { Methods as Methods_1b6sftz } from './v1/restrictions';
 import type { Methods as Methods_j6i6ex } from './v1/restrictions/_restrictionId@number';
+import type { Methods as Methods_1bsli8w } from './v1/shifts_requests';
+import type { Methods as Methods_h19e73 } from './v1/shifts_requests/_requestId@number';
+import type { Methods as Methods_px9cj1 } from './v1/shifts_requests/_year@number/_month@number';
 
 const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
   const prefix = (baseURL === undefined ? '' : baseURL).replace(/\/$/, '');
@@ -25,6 +28,7 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
   const PATH5 = '/v1/employees_restrictions';
   const PATH6 = '/v1/qualifications';
   const PATH7 = '/v1/restrictions';
+  const PATH8 = '/v1/shifts_requests';
   const GET = 'GET';
   const POST = 'POST';
   const PUT = 'PUT';
@@ -194,6 +198,41 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
         $post: (option: { body: Methods_1b6sftz['post']['reqBody'], config?: T | undefined }) =>
           fetch<Methods_1b6sftz['post']['resBody']>(prefix, PATH7, POST, option).json().then(r => r.body),
         $path: () => `${prefix}${PATH7}`,
+      },
+      shifts_requests: {
+        _requestId: (val2: number) => {
+          const prefix2 = `${PATH8}/${val2}`;
+
+          return {
+            delete: (option?: { config?: T | undefined } | undefined) =>
+              fetch<Methods_h19e73['delete']['resBody']>(prefix, prefix2, DELETE, option).json(),
+            $delete: (option?: { config?: T | undefined } | undefined) =>
+              fetch<Methods_h19e73['delete']['resBody']>(prefix, prefix2, DELETE, option).json().then(r => r.body),
+            $path: () => `${prefix}${prefix2}`,
+          };
+        },
+        _year: (val2: number) => {
+          const prefix2 = `${PATH8}/${val2}`;
+
+          return {
+            _month: (val3: number) => {
+              const prefix3 = `${prefix2}/${val3}`;
+
+              return {
+                get: (option?: { config?: T | undefined } | undefined) =>
+                  fetch<Methods_px9cj1['get']['resBody']>(prefix, prefix3, GET, option).json(),
+                $get: (option?: { config?: T | undefined } | undefined) =>
+                  fetch<Methods_px9cj1['get']['resBody']>(prefix, prefix3, GET, option).json().then(r => r.body),
+                $path: () => `${prefix}${prefix3}`,
+              };
+            },
+          };
+        },
+        post: (option: { body: Methods_1bsli8w['post']['reqBody'], config?: T | undefined }) =>
+          fetch<Methods_1bsli8w['post']['resBody']>(prefix, PATH8, POST, option).json(),
+        $post: (option: { body: Methods_1bsli8w['post']['reqBody'], config?: T | undefined }) =>
+          fetch<Methods_1bsli8w['post']['resBody']>(prefix, PATH8, POST, option).json().then(r => r.body),
+        $path: () => `${prefix}${PATH8}`,
       },
     },
   };
