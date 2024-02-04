@@ -67,3 +67,12 @@ export interface ChaseChange {
   restrictions?: Restriction[];
   [key: string]: any;
 }
+
+export type VacationRecord = {
+  date: string;
+  employee_id: number;
+  id: number;
+  type_of_vacation: string;
+};
+
+export type VacationRecords = VacationRecord[];

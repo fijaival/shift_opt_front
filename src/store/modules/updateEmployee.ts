@@ -15,15 +15,9 @@ import {
 
 import { addDependency, deleteDependency } from "../../api/dependenciesApi";
 
-type RootState = {
-  version: string;
-};
+import { RootState, UodateState } from "../types/index";
 
-interface RestrictionState {
-  change: UpdateEmployee;
-}
-
-const actions: ActionTree<RestrictionState, RootState> = {
+const actions: ActionTree<UodateState, RootState> = {
   // ここの繰り返し呼び出しは必ず修正
   async updateEmployee(_, change: UpdateEmployee) {
     try {
@@ -106,7 +100,7 @@ const actions: ActionTree<RestrictionState, RootState> = {
   },
 };
 
-export const updateEmployeeModule: Module<RestrictionState, RootState> = {
+export const updateEmployeeModule: Module<UodateState, RootState> = {
   namespaced: true,
 
   actions,

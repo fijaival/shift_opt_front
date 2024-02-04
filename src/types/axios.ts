@@ -83,3 +83,11 @@ export interface UpdateEmployee {
 }
 
 export type Value = EmployeeQualification | EmployeeRestriction | Dependencies;
+
+export type PostVacationRecord = {
+  date: string;
+  employee_id: number;
+  type_of_vacation: string;
+};
+
+export type PostVacationRecords = PostVacationRecord[];

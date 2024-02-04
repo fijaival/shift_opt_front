@@ -4,17 +4,7 @@ import { AxiosError } from "axios";
 
 import aspida from "@aspida/axios";
 import api from "../../../api/$api";
-type RootState = {
-  version: string;
-};
-interface Login {
-  username: string;
-  password: string;
-}
-interface UserState {
-  user: string;
-  msg: string;
-}
+import { RootState, Login, UserState } from "../types/index";
 
 const state: UserState = {
   user: "",

@@ -1,19 +1,12 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
 import { PostResponse, Qualification } from "../../types";
+import { RootState, QualificationState } from "../types/index";
 
 import {
   fetchQualifications,
   addQualification,
   deleteQualification,
 } from "../../api/qualificationsApi";
-
-type RootState = {
-  version: string;
-};
-
-interface QualificationState {
-  qualifications: Qualification[];
-}
 
 const state: QualificationState = {
   qualifications: [],

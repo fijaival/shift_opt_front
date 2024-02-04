@@ -4,13 +4,13 @@ import { EmployeePostBody } from "../../types/axios";
 
 import { Employee, EmployeesType } from "../../types";
 
+import { RootState, EmployeeState } from "../types/index";
+
 import {
   fetchEmployees,
   addEmployee,
   deleteEmployee,
 } from "../../api/employeesApi";
-
-import { RootState, EmployeeState } from "../types/index";
 
 const state: EmployeeState = {
   employees: [],

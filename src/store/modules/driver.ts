@@ -2,20 +2,14 @@ import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
 import { Driver, DriversType, PostResponse } from "../../types";
 import { DriverPostBody } from "@/types/axios";
 
+import { RootState, DriverState } from "../types/index";
+
 import {
   fetchDrivers,
   addDriver,
   deleteDriver,
   updateDriverName,
 } from "../../api/driversApi";
-
-type RootState = {
-  version: string;
-};
-
-interface DriverState {
-  drivers: DriversType;
-}
 
 const state: DriverState = {
   drivers: [],

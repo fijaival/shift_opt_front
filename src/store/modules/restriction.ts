@@ -1,20 +1,13 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
 
 import { PostResponse, Restriction } from "../../types";
+import { RootState, RestrictionState } from "../types";
 
 import {
   fetchRestrictions,
   addRestriction,
   deleteRestriction,
 } from "../../api/restrictionsApi";
-
-type RootState = {
-  version: string;
-};
-
-interface RestrictionState {
-  restrictions: Restriction[];
-}
 
 const state: RestrictionState = {
   restrictions: [],
