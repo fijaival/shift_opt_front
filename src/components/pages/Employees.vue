@@ -36,9 +36,7 @@ export default {
       getEmployees: "employee/getEmployees",
     }),
   },
-  mounted() {
-    this.loadEmployees();
-  },
+
   methods: {
     ...mapActions({
       loadEmployees: "employee/loadEmployees",

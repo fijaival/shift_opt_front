@@ -17,6 +17,7 @@
       </tbody>
     </table>
   </div>
+  <div>{{ getRequests }}</div>
 </template>
 
 <script>
@@ -48,14 +49,11 @@ export default {
   },
   mounted() {
     this.loadRequests({ year: 2023, month: 11 });
-    this.loadEmployees();
-    console.log(this.getRequests);
     console.log(this.getEmployees);
   },
   methods: {
     ...mapActions({
       loadRequests: "request/loadRequests",
-      loadEmployees: "employee/loadEmployees",
     }),
     getVacationType(employeeId, day) {
       const date = `${this.month}-${day.toString().padStart(2, "0")}`;

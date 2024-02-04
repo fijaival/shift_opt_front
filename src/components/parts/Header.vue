@@ -30,7 +30,9 @@
       <nav
         class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center"
       >
-        <router-link class="mr-5 hover:text-gray-900" to="/">Home</router-link>
+        <router-link class="mr-5 hover:text-gray-900" to="/request"
+          >希望</router-link
+        >
         <router-link class="mr-5 hover:text-gray-900" to="/driver"
           >Driver</router-link
         >

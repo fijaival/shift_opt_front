@@ -20,6 +20,7 @@ export default {
   methods: {
     ...mapActions({
       loginAction: "user/login",
+      loadEmployees: "employee/loadEmployees",
       loadQualifictions: "qualification/loadQualifictions",
       loadRrestrictions: "restriction/loadRrestrictions",
     }),
@@ -28,6 +29,7 @@ export default {
         username: this.username,
         password: this.password,
       });
+      await this.loadEmployees();
       await this.loadQualifictions();
       await this.loadRrestrictions();
 
