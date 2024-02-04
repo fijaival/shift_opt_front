@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Header from "./components/globals/Header.vue";
+import Header from "./components/parts/Header.vue";
 import TextArea from "./components/parts/TextArea.vue";
 export default {
   components: {

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Employee } from "../../types";
+import { Employee } from "../../../types";
 export default {
   data() {
     return {
@@ -41,7 +41,10 @@ export default {
 };
 </script>
 <template>
-  <div class="px-6 py-4 text-left rounded-lg" @click="handleModal(employee)">
+  <div
+    class="h-full px-6 py-4 text-left rounded-lg"
+    @click="handleModal(employee)"
+  >
     <div class="mb-4 flex justify-between items-center">
       <h3 class="text-xl font-semibold text-gray-800">
         {{ employee.last_name }} {{ employee.first_name }}

@@ -1,7 +1,7 @@
 <script lang="ts">
-import TextArea from "../parts/TextArea.vue";
-import { Driver } from "../../types";
-import { DriverPostBody } from "../../types/axios";
+import TextArea from "../TextArea.vue";
+import { Driver } from "../../../types";
+import { DriverPostBody } from "../../../types/axios";
 export default {
   name: "DriverModal",
   components: {

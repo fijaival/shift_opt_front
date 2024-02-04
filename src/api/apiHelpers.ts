@@ -1,6 +1,6 @@
 import aspida from "@aspida/axios";
 import api from "../../api/$api";
-import AxiosInstance from "../lib/axios";
+import AxiosInstance from "./axios";
 
 // APIクライアントのインスタンスを生成する関数
 export const createApiClient = () => {
@@ -8,7 +8,7 @@ export const createApiClient = () => {
 };
 
 // ヘッダーにCSRFトークンを設定する関数
-export const getAuthHeaders = () => {
+export const getAuthHeaders = (): Record<string, string | null> => {
   const csrfToken = localStorage.getItem("CsrfAccessToken");
   return {
     "X-CSRF-TOKEN": csrfToken,

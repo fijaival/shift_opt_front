@@ -20,7 +20,7 @@ async function refreshTokenAndRetryRequest(error: AxiosError) {
         withCredentials: true,
         headers: {
           "X-CSRF-TOKEN": localStorage.getItem("CsrfRefreshToken"),
-          [NO_RETRY_HEADER]: "true", // リトライ防止ヘッダーを設定
+          [NO_RETRY_HEADER]: "true",
         },
       }
     );
@@ -61,7 +61,6 @@ axiosInstance.interceptors.response.use(
       console.log(
         "Error not related to authentication, or retry already attempted"
       );
-      console.log(Promise.reject(error));
       return Promise.reject(error);
     }
   }

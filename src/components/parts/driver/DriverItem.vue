@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Driver } from "../../types";
+import type { Driver } from "../../../types";
 
 export default {
   props: {

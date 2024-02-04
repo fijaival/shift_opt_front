@@ -5,12 +5,12 @@ import type {
   EmployeeQualification,
   EmployeeRestriction,
   Dependencies,
-} from "../../types";
-import TextArea from "../parts/TextArea.vue";
-import CheckLabel from "../parts/CheckLabel.vue";
-import CheckBox from "../parts/CheckBox.vue";
-import MiddleTitle from "../parts/MiddleTitle.vue";
-import RedWhiteButton from "../parts/RedWhiteButton.vue";
+} from "../../../types";
+import TextArea from "../TextArea.vue";
+import CheckLabel from "../CheckLabel.vue";
+import CheckBox from "../CheckBox.vue";
+import MiddleTitle from "../MiddleTitle.vue";
+import RedWhiteButton from "../RedWhiteButton.vue";
 
 export default {
   name: "EmployeeModal",

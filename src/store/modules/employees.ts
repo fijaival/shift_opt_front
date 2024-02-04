@@ -1,16 +1,16 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 
-import { Employee, EmployeesType } from "../../types";
 import { EmployeePostBody } from "../../types/axios";
 
-type RootState = {
-  version: string;
-};
+import { Employee, EmployeesType } from "../../types";
 
-interface EmployeeState {
-  employees: EmployeesType;
-}
+import {
+  fetchEmployees,
+  addEmployee,
+  deleteEmployee,
+} from "../../api/employeesApi";
+
+import { RootState, EmployeeState } from "../types/index";
 
 const state: EmployeeState = {
   employees: [],
@@ -29,57 +29,26 @@ const mutations: MutationTree<EmployeeState> = {
 };
 
 const actions: ActionTree<EmployeeState, RootState> = {
-  async fetchEmployees({ commit }) {
-    try {
-      const client = createApiClient();
-      const response = await client.v1.employees.get();
-
-      if (response.status === 200 && response.body) {
+  async loadEmployees({ commit }) {
+    await fetchEmployees()
+      .then((response) => {
         commit("setEmployees", response.body);
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (error) {
-      console.error("Error fetching employees: ", error);
-    }
+      })
+      .catch((error) => console.error("Error fetching employees: ", error));
   },
 
-  async addEmployee(_, newEmployee: EmployeePostBody) {
-    try {
-      const client = createApiClient();
-      const headers = getAuthHeaders();
-      console.log(newEmployee);
-      const response = await client.v1.employees.post({
-        body: newEmployee,
-        config: { headers: headers },
-      });
-      if (response.status === 201) {
-        // stateのEmployeeとpostするときに
-      } else {
-        throw new Error("Failed to add new employee");
-      }
-    } catch (error) {
-      console.log(error);
-      console.error("Error adding new employee: ", error);
-    }
+  async createEmployee(_, newEmployee: EmployeePostBody) {
+    await addEmployee(newEmployee)
+      .then()
+      .catch((error) => console.error("Error adding new employee: ", error));
   },
-  async deleteEmployee({ commit }, employeeId: number) {
-    try {
-      const client = createApiClient();
-      const headers = getAuthHeaders();
-      const response = await client.v1.employees
-        ._employeeId(employeeId)
-        .delete({
-          config: { headers },
-        });
-      if (response.status === 200) {
+
+  async removeEmployee({ commit }, employeeId: number) {
+    await deleteEmployee(employeeId)
+      .then(() => {
         commit("removeEmployee", employeeId);
-      } else {
-        throw new Error("Failed to delete employee");
-      }
-    } catch (error) {
-      console.error("Error deleting employee: ", error);
-    }
+      })
+      .catch((error) => console.error("Error removing employee: ", error));
   },
 };
 

@@ -1,8 +1,19 @@
 import { ActionTree, Module } from "vuex";
-
-import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
-
 import { UpdateEmployee } from "../../types/axios";
+
+import { updateEmployeeName } from "../../api/employeesApi";
+import {
+  addEmployeeQualification,
+  deleteEmployeeQualification,
+} from "../../api/qualificationsApi";
+
+import {
+  addEmployeeRestriction,
+  deleteEmployeeRestriction,
+  updateEmployeeRestriction,
+} from "../../api/restrictionsApi";
+
+import { addDependency, deleteDependency } from "../../api/dependenciesApi";
 
 type RootState = {
   version: string;
@@ -16,106 +27,77 @@ const actions: ActionTree<RestrictionState, RootState> = {
   // ここの繰り返し呼び出しは必ず修正
   async updateEmployee(_, change: UpdateEmployee) {
     try {
-      const client = createApiClient();
-      for (const restriction of change.restrictions.post) {
-        const headers = getAuthHeaders();
-        const response = await client.v1.employees_restrictions.post({
-          body: restriction,
-          config: { headers },
-        });
-        if (response.status !== 201) {
-          throw new Error("Failed to add new Restriction");
+      // POST
+      try {
+        for (const restriction of change.restrictions.post) {
+          await addEmployeeRestriction(restriction);
         }
+      } catch (error) {
+        console.error("Failed to add new Restriction", error);
+        throw error;
+      }
+      try {
+        for (const qualification of change.qualifications.post) {
+          await addEmployeeQualification(qualification);
+        }
+      } catch (error) {
+        console.error("Failed to add new Qualification", error);
+        throw error;
+      }
+      try {
+        for (const dependency of change.dependencies.post) {
+          await addDependency(dependency);
+        }
+      } catch (error) {
+        console.error("Failed to add new Dependency", error);
+        throw error;
       }
 
-      for (const qualification of change.qualifications.post) {
-        const headers = getAuthHeaders();
-        const response = await client.v1.employees_qualifications.post({
-          body: qualification,
-          config: { headers },
-        });
-        if (response.status !== 201) {
-          throw new Error("Failed to add new Qualification");
+      // DELETE
+      try {
+        for (const restrictionId of change.restrictions.delete) {
+          await deleteEmployeeRestriction(restrictionId);
         }
+      } catch (error) {
+        console.error("Failed to delete  EmployeeRestrictions", error);
+        throw error;
       }
 
-      for (const dependency of change.dependencies.post) {
-        const headers = getAuthHeaders();
-        const response = await client.v1.dependencies.post({
-          body: dependency,
-          config: { headers },
-        });
-        if (response.status !== 201) {
-          throw new Error("リクエストが成功しませんでした。"); // エラーメッセージは状況に応じて適切に設定してください。
+      try {
+        for (const qualificationId of change.qualifications.delete) {
+          await deleteEmployeeQualification(qualificationId);
         }
-      }
-      for (const restrictionId of change.restrictions.delete) {
-        const headers = getAuthHeaders();
-        const response = await client.v1.employees_restrictions
-          ._erId(restrictionId)
-          .delete({
-            config: { headers },
-          });
-        if (response.status !== 200) {
-          throw new Error(
-            "Failed to delete No." + restrictionId + "restrictions"
-          );
-        }
-      }
-      for (const qualificationId of change.qualifications.delete) {
-        const headers = getAuthHeaders();
-        const response = await client.v1.employees_qualifications
-          ._eqId(qualificationId)
-          .delete({
-            config: { headers },
-          });
-        if (response.status !== 200) {
-          throw new Error(
-            "Failed to delete No." + qualificationId + "qualifications"
-          );
-        }
+      } catch (error) {
+        console.error("Failed to delete  EmployeeQualifications", error);
+        throw error;
       }
 
-      for (const dependencyId of change.dependencies.delete) {
-        const headers = getAuthHeaders();
-        const response = await client.v1.dependencies
-          ._depId(dependencyId)
-          .delete({
-            config: { headers },
-          });
-        if (response.status !== 200) {
-          throw new Error(
-            "Failed to delete No." + dependencyId + "dependencies"
-          );
+      try {
+        for (const dependencyId of change.dependencies.delete) {
+          await deleteDependency(dependencyId);
         }
+      } catch (error) {
+        console.error("Failed to delete  dependency", error);
+        throw error;
       }
-      for (const restriction of change.restrictions.put) {
-        const headers = getAuthHeaders();
-        const { value } = restriction;
-        const newValue = { value };
-        const response = await client.v1.employees_restrictions
-          ._erId(restriction.id)
-          .put({
-            body: newValue,
-            config: { headers },
-          });
-        if (response.status !== 200) {
-          throw new Error(
-            "Failed to update No." + restriction.id + "restrictions"
-          );
+
+      // PUT
+      try {
+        for (const restriction of change.restrictions.put) {
+          await updateEmployeeRestriction(restriction);
         }
+      } catch (error) {
+        console.error("Failed to update Employee Restrictions", error);
+        throw error;
       }
-      for (const name of change.name.put) {
-        const headers = getAuthHeaders();
-        const { first_name, last_name } = name;
-        const newName = { first_name, last_name };
-        const response = await client.v1.employees._employeeId(name.id).put({
-          body: newName,
-          config: { headers },
-        });
-        if (response.status !== 200) {
-          throw new Error("Failed to update No." + name.id + "Employee name");
+
+      try {
+        for (const name of change.name.put) {
+          await updateEmployeeName(name);
         }
+      } catch (error) {
+        console.error("Failed to update Employee name", error);
+        throw error;
       }
     } catch (error) {
       console.log(error);

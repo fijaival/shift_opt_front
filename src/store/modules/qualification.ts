@@ -1,6 +1,11 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import { createApiClient, getAuthHeaders } from "../../lib/apiHelpers";
 import { PostResponse, Qualification } from "../../types";
+
+import {
+  fetchQualifications,
+  addQualification,
+  deleteQualification,
+} from "../../api/qualificationsApi";
 
 type RootState = {
   version: string;
@@ -26,61 +31,36 @@ const mutations: MutationTree<QualificationState> = {
     )),
 };
 const actions: ActionTree<QualificationState, RootState> = {
-  async fetchQualifications({ commit }) {
-    try {
-      const client = createApiClient();
-      const response = await client.v1.qualifications.get();
-
-      if (response.status === 200 && response.body) {
+  async loadQualifictions({ commit }) {
+    fetchQualifications()
+      .then((response) => {
         commit("setQualifications", response.body);
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (error) {
-      console.error("Error fetching qualifications: ", error);
-    }
+      })
+      .catch((error) =>
+        console.error("Error fetching qualifications: ", error)
+      );
   },
-  async addQualification({ commit }, newQualification) {
-    try {
-      const client = createApiClient();
-      const headers = getAuthHeaders();
-
-      const response = await client.v1.qualifications.post({
-        body: newQualification,
-        config: { headers },
-      });
-      if (response.status === 201) {
+  async createQualification({ commit }, newQualification) {
+    await addQualification(newQualification)
+      .then((response) => {
         const newQualificationResponse: PostResponse = response.body;
         const addedQualification: Qualification = {
           id: newQualificationResponse.id,
           ...newQualification,
         };
         commit("addQualification", addedQualification);
-      } else {
-        throw new Error("Failed to add new Qualification");
-      }
-    } catch (error) {
-      console.log(error);
-      console.error("Error adding new Qualification: ", error);
-    }
+      })
+      .catch((error) =>
+        console.error("Error adding new Qualification: ", error)
+      );
   },
-  async deleteQualification({ commit }, qualificationId: number) {
-    try {
-      const client = createApiClient();
-      const headers = getAuthHeaders();
-      const response = await client.v1.qualifications
-        ._qualificationId(qualificationId)
-        .delete({
-          config: { headers },
-        });
-      if (response.status === 200) {
+
+  async removeQualification({ commit }, qualificationId: number) {
+    await deleteQualification(qualificationId)
+      .then(() => {
         commit("removeQualification", qualificationId);
-      } else {
-        throw new Error("Failed to delete qualification");
-      }
-    } catch (error) {
-      console.error("Error deleting qualification: ", error);
-    }
+      })
+      .catch((error) => console.error("Error removing qualification: ", error));
   },
 };
 const getters: GetterTree<QualificationState, RootState> = {

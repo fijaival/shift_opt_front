@@ -1,5 +1,5 @@
 import { ActionTree, MutationTree, GetterTree, Module } from "vuex";
-import axiosInstance from "../../lib/axios";
+import axiosInstance from "../../api/axios";
 import { AxiosError } from "axios";
 
 import aspida from "@aspida/axios";

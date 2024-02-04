@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Driver } from "../../types";
 import { mapActions, mapGetters } from "vuex";
-import DriverItem from "../parts/DriverItem.vue";
+import DriverItem from "../parts/driver/DriverItem.vue";
 
-import DriverModal from "../globals/DriverModal.vue";
+import DriverModal from "../parts/driver/DriverModal.vue";
 
 export default {
   name: "DriverView",
@@ -26,13 +26,13 @@ export default {
     }),
   },
   mounted() {
-    this.fetchDrivers();
+    this.loadDrivers();
   },
   methods: {
     ...mapActions({
-      fetchDrivers: "driver/fetchDrivers",
-      addDriver: "driver/addDriver",
-      deleteDriver: "driver/deleteDriver",
+      loadDrivers: "driver/loadDrivers",
+      createDriver: "driver/createDriver",
+      removeDriver: "driver/removeDriver",
       updateDriver: "driver/updateDriver",
     }),
     initializeState() {
@@ -55,11 +55,11 @@ export default {
     },
     async saveDriver(newDriver: Driver) {
       if (!newDriver.id) {
-        this.addDriver(newDriver);
+        this.createDriver(newDriver);
       } else {
         try {
           await this.updateDriver(newDriver);
-          this.fetchDrivers();
+          this.loadDrivers();
         } catch (error) {
           console.error(error + "従業員の更新に失敗しました");
         }
@@ -75,7 +75,7 @@ export default {
     <div class="p-2 w-full" v-for="driver in getDrivers" :key="driver.id">
       <DriverItem
         :driver="driver"
-        :deleteDriver="deleteDriver"
+        :deleteDriver="removeDriver"
         :setShowModal="setShowModal"
         :setTargetDriver="setTargetDriver"
       />

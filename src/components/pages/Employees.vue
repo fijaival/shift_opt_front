@@ -2,8 +2,8 @@
 import { mapActions, mapGetters } from "vuex";
 import { Employee, EmployeeWithId } from "../../types";
 
-import EmployeeModal from "../globals/EmployeeModal.vue";
-import EmployeeItem from "../parts/EmployeeItem.vue";
+import EmployeeModal from "../parts/employee/EmployeeModal.vue";
+import EmployeeItem from "../parts/employee/EmployeeItem.vue";
 
 import organizeData from "../../lib/organizeData";
 
@@ -37,13 +37,13 @@ export default {
     }),
   },
   mounted() {
-    this.fetchEmployes();
+    this.loadEmployees();
   },
   methods: {
     ...mapActions({
-      fetchEmployes: "employee/fetchEmployees",
-      deleteEmployee: "employee/deleteEmployee",
-      addEmployee: "employee/addEmployee",
+      loadEmployees: "employee/loadEmployees",
+      removeEmployee: "employee/removeEmployee",
+      createEmployee: "employee/createEmployee",
       updateEmployee: "updateEmployee/updateEmployee",
     }),
     toggleDetails(employee: ShowDetail) {
@@ -63,9 +63,9 @@ export default {
     async saveEmployee(employee: Employee) {
       if (!employee.id) {
         try {
-          await this.addEmployee(employee);
+          await this.createEmployee(employee);
 
-          this.fetchEmployes();
+          this.loadEmployees();
         } catch (error) {
           console.error("Employee fetchエラー", error);
         }
@@ -78,15 +78,15 @@ export default {
         console.log(change);
         try {
           await this.updateEmployee(change);
-          this.fetchEmployes();
+          this.loadEmployees();
         } catch (error) {
           console.error(error + "従業員の更新に失敗しました。");
         }
       }
     },
 
-    removeEmployee(employeeId: number) {
-      this.deleteEmployee(employeeId);
+    deleteEmployee(employeeId: number) {
+      this.removeEmployee(employeeId);
     },
 
     setTargetEmployee(employee: EmployeeWithId) {
