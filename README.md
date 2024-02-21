@@ -1,57 +1,47 @@
-# Vue 3 + TypeScript + Vite
+# シフト自動生成サービス - フロントエンド
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+このプロジェクトは従業員の管理、シフト希望の管理、そしてシフトの自動生成を行う Web サービスのフロントエンド部分です。Vue 3 と TypeScript, Vite を使用して開発されています。
 
-## Recommended IDE Setup
+## 特徴
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+- **従業員管理**: 従業員の個人情報、資格、勤務上の制約などを管理。
+- **従業員管理**: ドライバーの個人情報などを管理。
+- **シフト希望管理**: 従業員からのシフト希望を収集、管理。
+- **シフト管理**: これまで作成したシフトを管理。
+- **シフト自動生成**: 従業員の希望と必要条件をもとに、最適なシフトを自動生成。
 
-## Type Support For `.vue` Imports in TS
+### 必要条件
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+- Node.js (18.18.0 で動作確認済み)
+- npm (または Yarn)
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+### セットアップ
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+1. リポジトリをクローンします。
+
+```bash
+git clone https://github.com/fijaival/shift_opt_front.git
+cd shift_opt_front
+```
+
+2. 依存関係をインストールします
+
+```
+npm i
+```
+
+3. 開発サーバーを起動します
+
+```
+npm run dev
+```
 
 # aspida による api の型定義
 
-https://github.com/aspida/aspida
-api フォルダ以下で定義後、`npm run api:build`
+ルートディレクトリにある api ディレクトリ下で型定義後、以下のコマンドを実行します。
 
 ```
-import type { DefineMethods } from "aspida";
-
-type User = {
-  id: number;
-  name: string;
-};
-
-export type Methods = DefineMethods<{
-  get: {
-    query?: {
-      limit: number;
-    };
-
-    resBody: User[];
-  };
-
-  post: {
-    reqBody: {
-      name: string;
-    };
-
-    resBody: User;
-    /**
-     * reqHeaders(?): ...
-     * reqFormat: ...
-     * status: ...
-     * resHeaders(?): ...
-     * polymorph: [...]
-     */
-  };
-}>;
+npm run api:build
 ```
+
+[参考](https://github.com/aspida/aspida)
