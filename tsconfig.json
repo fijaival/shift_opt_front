@@ -5,11 +5,13 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-    "types": ["axios.d.ts"],
+
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
+
     },
+    "typeRoots" : ["./node_modules/@types"],
 
     /* Bundler mode */
     "moduleResolution": "node",
